@@ -45,24 +45,16 @@
     text-shadow: 0 2px 8px rgba(0,0,0,0.2);
     line-height: 1.1;
   }
-  .title-sub {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.85);
-    margin-top: 4px;
-    font-weight: 500;
-  }
+  .title-sub { font-size: 0.85rem; color: rgba(255,255,255,0.85); margin-top: 4px; font-weight: 500; }
 
   /* ── MAIN ── */
   main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
 
   /* ── CARD ── */
   .team-card {
-    background: var(--card-bg);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 28px;
-    overflow: hidden;
-    border: 1px solid var(--border);
+    background: var(--card-bg); border-radius: 20px;
+    box-shadow: var(--shadow); margin-bottom: 28px;
+    overflow: hidden; border: 1px solid var(--border);
   }
   .card-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -72,10 +64,8 @@
     flex-wrap: wrap; gap: 8px;
   }
   .card-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.3rem;
-    color: var(--primary);
-    display: flex; align-items: center; gap: 8px;
+    font-family: 'Fredoka One', cursive; font-size: 1.3rem;
+    color: var(--primary); display: flex; align-items: center; gap: 8px;
   }
   .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -91,9 +81,6 @@
   .btn-outline:hover { background: #fff5f0; }
   .btn-mint { background: var(--mint); color: #fff; }
   .btn-mint:hover { background: #05bc8e; transform: translateY(-1px); }
-  .btn-danger { background: #ff4757; color: #fff; }
-  .btn-danger:hover { background: #e63946; }
-  .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
 
   /* ── TABLE ── */
   .table-wrap { overflow-x: auto; padding: 0 0 4px; }
@@ -103,22 +90,17 @@
     color: #fff; font-size: 0.8rem; font-weight: 700;
     padding: 10px 10px; text-align: center; white-space: nowrap;
   }
-  th:first-child { border-radius: 0; }
   td {
     padding: 9px 10px; text-align: center; font-size: 0.85rem;
     border-bottom: 1px solid #f5ece4;
   }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #fffaf7; }
-  .rank1-row td { background: rgba(255,215,0,0.08); font-weight: 700; }
-  .rank2-row td { background: rgba(192,192,192,0.08); }
 
-  /* 셀 색상 */
   .score-gold { color: #c8860a; font-weight: 700; }
   .score-silver { color: #888; font-weight: 700; }
   .score-absent { color: #ccc; font-style: italic; font-size: 0.75rem; }
 
-  /* 집계 행 */
   .tally-row td {
     background: linear-gradient(90deg, #fffbf0, #fff9f5);
     font-weight: 700; font-size: 0.82rem;
@@ -126,54 +108,34 @@
   }
   .tally-label { font-size: 0.78rem; color: #888; text-align: left; padding-left: 12px; }
 
-  /* 인라인 편집 */
   .editable { cursor: pointer; }
   .editable:hover { background: #fff3ee; border-radius: 4px; }
   input.inline-edit {
     width: 100%; border: 2px solid var(--primary); border-radius: 6px;
     padding: 3px 6px; font-size: 0.85rem; text-align: center;
-    font-family: 'Noto Sans KR', sans-serif; outline: none;
-    background: #fff8f5;
+    font-family: 'Noto Sans KR', sans-serif; outline: none; background: #fff8f5;
   }
 
-  /* 월/비고 셀 */
   .month-cell { font-weight: 700; color: var(--primary); white-space: nowrap; font-size: 0.82rem; }
   .note-cell { font-size: 0.78rem; color: #999; min-width: 80px; }
-
-  /* 삭제 버튼 셀 */
   .del-cell { width: 32px; }
   .del-btn { background: none; border: none; cursor: pointer; color: #ffb3a0; font-size: 1rem; padding: 2px; line-height: 1; }
   .del-btn:hover { color: #ff4757; }
 
-  /* ── LEADER SECTION ── */
+  /* ── LEADER ── */
   .leader-section {
-    background: var(--card-bg);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 24px 20px;
-    border: 1px solid var(--border);
-    margin-top: 8px;
+    background: var(--card-bg); border-radius: 20px;
+    box-shadow: var(--shadow); padding: 24px 20px;
+    border: 1px solid var(--border); margin-top: 8px;
   }
   .leader-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.4rem;
-    color: var(--primary);
-    text-align: center;
-    margin-bottom: 20px;
+    font-family: 'Fredoka One', cursive; font-size: 1.4rem;
+    color: var(--primary); text-align: center; margin-bottom: 20px;
   }
   .leader-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .leader-card {
-    border-radius: 14px; padding: 18px 16px; text-align: center;
-    border: 2px solid transparent;
-  }
-  .leader-card.gold-card {
-    background: linear-gradient(135deg, #fffbe6, #fff8d0);
-    border-color: var(--gold);
-  }
-  .leader-card.silver-card {
-    background: linear-gradient(135deg, #f8f8f8, #f0f0f0);
-    border-color: var(--silver);
-  }
+  .leader-card { border-radius: 14px; padding: 18px 16px; text-align: center; border: 2px solid transparent; }
+  .leader-card.gold-card { background: linear-gradient(135deg, #fffbe6, #fff8d0); border-color: var(--gold); }
+  .leader-card.silver-card { background: linear-gradient(135deg, #f8f8f8, #f0f0f0); border-color: var(--silver); }
   .leader-medal { font-size: 2rem; margin-bottom: 6px; }
   .leader-rank { font-size: 0.7rem; font-weight: 700; color: #888; margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
   .leader-name { font-size: 1.1rem; font-weight: 700; color: var(--text); }
@@ -195,11 +157,7 @@
     transform: translateY(20px); transition: transform 0.2s;
   }
   .modal-overlay.active .modal { transform: translateY(0); }
-  .modal h2 {
-    font-family: 'Fredoka One', cursive;
-    color: var(--primary); font-size: 1.3rem; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .modal h2 { font-family: 'Fredoka One', cursive; color: var(--primary); font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
   .form-row { margin-bottom: 14px; }
   .form-row label { display: block; font-size: 0.8rem; font-weight: 700; color: #666; margin-bottom: 5px; }
   .form-row input, .form-row select, .form-row textarea {
@@ -227,14 +185,11 @@
 
   /* ── LOADING ── */
   .loading-overlay {
-    position: fixed; inset: 0; background: rgba(255,249,245,0.85);
+    position: fixed; inset: 0; background: rgba(255,249,245,0.9);
     display: flex; align-items: center; justify-content: center; z-index: 500;
+    transition: opacity 0.3s;
   }
-  .spinner {
-    width: 44px; height: 44px; border: 4px solid #ffd166;
-    border-top-color: var(--primary); border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .spinner { width: 44px; height: 44px; border: 4px solid #ffd166; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── RESPONSIVE ── */
@@ -245,18 +200,11 @@
     .leader-name { font-size: 0.95rem; }
     .card-header { flex-direction: column; align-items: flex-start; }
     .modal { padding: 20px 16px; }
-    .score-inputs { grid-template-columns: 1fr 1fr; }
   }
-  @media (max-width: 380px) {
-    .leader-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 380px) { .leader-grid { grid-template-columns: 1fr; } }
 
   .empty-row td { color: #ccc; font-style: italic; padding: 20px; text-align: center; }
-  .badge {
-    display: inline-block; background: var(--secondary);
-    color: #c8860a; border-radius: 20px; padding: 2px 10px;
-    font-size: 0.72rem; font-weight: 700; margin-left: 6px;
-  }
+  .badge { display: inline-block; background: var(--secondary); color: #c8860a; border-radius: 20px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700; margin-left: 6px; }
   .settings-member-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
   .settings-member-row label { font-size: 0.78rem; color: #888; min-width: 40px; }
   .settings-member-row input { flex: 1; }
@@ -265,7 +213,6 @@
 </head>
 <body>
 
-<!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay">
   <div style="text-align:center">
     <div class="spinner"></div>
@@ -273,58 +220,38 @@
   </div>
 </div>
 
-<!-- Header -->
 <header>
   <div class="header-inner">
     <div class="logo-wrap">
-      <!-- SVG 로고: 행복한 부부 + 골프공 -->
       <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-        <!-- 잔디 배경 -->
-        <ellipse cx="40" cy="72" rx="36" ry="7" fill="#4CAF50" opacity="0.3"/>
         <rect x="4" y="68" width="72" height="8" rx="4" fill="#4CAF50"/>
-        <!-- 잔디 결 -->
         <path d="M10 68 Q12 63 14 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
         <path d="M20 68 Q22 62 24 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
         <path d="M35 68 Q37 61 39 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
         <path d="M50 68 Q52 63 54 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
         <path d="M63 68 Q65 64 67 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
-        <!-- 골프공 -->
         <circle cx="40" cy="65" r="6" fill="white" stroke="#ddd" stroke-width="1"/>
         <path d="M36 63 Q38 62 40 63" stroke="#ccc" fill="none" stroke-width="0.8"/>
         <path d="M40 65 Q42 64 44 65" stroke="#ccc" fill="none" stroke-width="0.8"/>
         <path d="M37 67 Q39 66 41 67" stroke="#ccc" fill="none" stroke-width="0.8"/>
-        <!-- 하트 -->
         <path d="M40 32 C40 32 30 25 30 19 C30 15 34 12 37 14 C38.5 15 40 17 40 17 C40 17 41.5 15 43 14 C46 12 50 15 50 19 C50 25 40 32 40 32Z" fill="#FF6B9D"/>
-        <!-- 여성 (핑크 드레스) -->
         <circle cx="29" cy="18" r="6" fill="#FFCC80"/>
-        <!-- 여성 머리카락 -->
         <path d="M23 16 Q26 10 29 12 Q32 10 35 16" fill="#795548"/>
         <path d="M23 16 Q22 20 24 22" stroke="#795548" fill="none" stroke-width="2"/>
-        <!-- 여성 얼굴 -->
         <circle cx="27" cy="17" r="1" fill="#795548"/>
         <circle cx="31" cy="17" r="1" fill="#795548"/>
         <path d="M27 20 Q29 22 31 20" stroke="#FF6B9D" fill="none" stroke-width="1.2"/>
-        <!-- 여성 몸 - 핑크 드레스 -->
         <path d="M24 24 L29 22 L34 24 L36 38 L29 40 L22 38Z" fill="#FF6B9D"/>
-        <!-- 드레스 스커트 -->
         <path d="M22 33 L18 48 L29 46 L40 48 L36 33Z" fill="#FF8FAB"/>
-        <!-- 여성 팔 (하트 방향) -->
         <path d="M34 27 Q37 28 40 30" stroke="#FFCC80" fill="none" stroke-width="3" stroke-linecap="round"/>
-        <!-- 남성 (파란 정장) -->
         <circle cx="51" cy="18" r="6" fill="#FFCC80"/>
-        <!-- 남성 머리카락 -->
         <path d="M45 15 Q51 10 57 15" fill="#4E342E"/>
-        <!-- 남성 얼굴 -->
         <circle cx="49" cy="17" r="1" fill="#4E342E"/>
         <circle cx="53" cy="17" r="1" fill="#4E342E"/>
         <path d="M49 20 Q51 22 53 20" stroke="#FF6B35" fill="none" stroke-width="1.2"/>
-        <!-- 남성 몸 - 파란 정장 -->
         <path d="M46 24 L51 22 L56 24 L57 40 L51 42 L45 40Z" fill="#1565C0"/>
-        <!-- 넥타이 -->
         <path d="M50 24 L51 22 L52 24 L51 36Z" fill="#FF6B35"/>
-        <!-- 남성 팔 (하트 방향) -->
         <path d="M46 27 Q43 28 40 30" stroke="#FFCC80" fill="none" stroke-width="3" stroke-linecap="round"/>
-        <!-- 반짝이 효과 -->
         <circle cx="15" cy="12" r="1.5" fill="#FFD700" opacity="0.8"/>
         <circle cx="65" cy="10" r="1.5" fill="#FFD700" opacity="0.8"/>
         <circle cx="70" cy="22" r="1" fill="#FFD700" opacity="0.6"/>
@@ -340,13 +267,10 @@
 </header>
 
 <main>
-  <!-- 팀 카드들 -->
   <div id="teamsContainer"></div>
-
-  <!-- 리더 섹션 -->
   <div class="leader-section">
     <div class="leader-title">🏆 2026 시즌 현재 리더</div>
-    <div class="leader-grid" id="leaderGrid">
+    <div class="leader-grid">
       <div class="leader-card gold-card">
         <div class="leader-medal">🥇</div>
         <div class="leader-rank">시즌 1위</div>
@@ -365,7 +289,6 @@
   </div>
 </main>
 
-<!-- Toast -->
 <div id="toast"></div>
 
 <!-- 라운드 추가 모달 -->
@@ -378,14 +301,14 @@
       <input type="text" id="roundTeamName" readonly style="background:#f5f5f5;color:#888">
     </div>
     <div class="form-row">
-      <label>월 (예: 4월, 5월)</label>
+      <label>월</label>
       <select id="roundMonth">
         <option value="">월 선택</option>
-        <option value="4월">4월</option><option value="5월">5월</option>
-        <option value="6월">6월</option><option value="7월">7월</option>
-        <option value="8월">8월</option><option value="9월">9월</option>
-        <option value="10월">10월</option><option value="11월">11월</option>
-        <option value="12월">12월</option>
+        <option value="4">4월</option><option value="5">5월</option>
+        <option value="6">6월</option><option value="7">7월</option>
+        <option value="8">8월</option><option value="9">9월</option>
+        <option value="10">10월</option><option value="11">11월</option>
+        <option value="12">12월</option>
       </select>
     </div>
     <div class="form-row">
@@ -422,24 +345,34 @@
 
 <script>
 // ═══════════════════════════════════════════
-// SUPABASE 초기화
+// SUPABASE
 // ═══════════════════════════════════════════
 const SUPABASE_URL = '__SUPABASE_URL__';
 const SUPABASE_KEY = '__SUPABASE_KEY__';
-const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const sb = (window.supabase && !SUPABASE_URL.includes('__'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
 
-// ═══════════════════════════════════════════
-// 앱 상태
-// ═══════════════════════════════════════════
-let state = {
-  teams: [],      // [{id, name, order}]
-  members: [],    // [{id, team_id, name, order}]
-  rounds: [],     // [{id, team_id, month, date, note}]
-  scores: []      // [{id, round_id, member_id, score, absent}]
+// ── DB 컬럼 ↔ 앱 내부 포맷 변환 ──────────────
+const fromDB = {
+  team: r => ({ id: r.id, name: r.team_name, order: r.display_order }),
+  member: r => ({ id: r.id, team_id: r.team_id, name: r.name, order: r.display_order }),
+  round: r => ({ id: r.id, team_id: r.team_id, month: r.month + '월', date: r.round_date, note: r.note || '' }),
+  score: r => ({ id: r.id, round_id: r.round_id, member_id: r.member_id, score: r.strokes, absent: r.strokes === null })
+};
+const toDB = {
+  round: a => ({ team_id: a.team_id, month: parseInt(a.month), round_date: a.date || null, note: a.note || '' }),
+  score: (roundId, memberId, score, absent) => ({ round_id: roundId, member_id: memberId, strokes: absent ? null : score })
 };
 
-// 기본 데이터 (DB 연결 실패 시 사용)
-const DEFAULT_DATA = {
+// ── 상태 ─────────────────────────────────────
+let state = { teams: [], members: [], rounds: [], scores: [] };
+let useLocal = false;
+let _nextId = 100;
+const nextId = () => _nextId++;
+
+// ── 기본 데이터 (DB 미연결 시) ───────────────
+const DEFAULTS = {
   teams: [
     { id: 1, name: '1조', order: 1 },
     { id: 2, name: '2조', order: 2 }
@@ -454,101 +387,65 @@ const DEFAULT_DATA = {
     { id: 7, team_id: 2, name: '赵相元', order: 3 },
     { id: 8, team_id: 2, name: '朴钟弼', order: 4 }
   ],
-  rounds: [
-    { id: 1, team_id: 2, month: '4월', date: '2026-04-05', note: '블루원 리조트' },
-    { id: 2, team_id: 2, month: '5월', date: '2026-05-10', note: '레이크사이드CC' }
-  ],
-  scores: [
-    { id: 1, round_id: 1, member_id: 5, score: 92, absent: false },
-    { id: 2, round_id: 1, member_id: 6, score: 88, absent: false },
-    { id: 3, round_id: 1, member_id: 7, score: 95, absent: false },
-    { id: 4, round_id: 1, member_id: 8, score: 90, absent: false },
-    { id: 5, round_id: 2, member_id: 5, score: 89, absent: false },
-    { id: 6, round_id: 2, member_id: 6, score: 91, absent: false },
-    { id: 7, round_id: 2, member_id: 7, score: null, absent: true },
-    { id: 8, round_id: 2, member_id: 8, score: 86, absent: false }
-  ]
+  rounds: [],
+  scores: []
 };
-
-let useLocalData = false;
-let nextId = { teams: 10, members: 20, rounds: 10, scores: 50 };
 
 // ═══════════════════════════════════════════
 // 초기화
 // ═══════════════════════════════════════════
 async function init() {
-  if (!sb || SUPABASE_URL.includes('__')) {
-    console.warn('Supabase 미연결 → 로컬 데이터 사용');
-    useLocalData = true;
-    state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  if (!sb) {
+    useLocal = true;
+    state = JSON.parse(JSON.stringify(DEFAULTS));
     hideLoading();
     render();
+    showToast('로컬 모드 (DB 미연결)', 'error');
     return;
   }
   try {
-    await loadFromSupabase();
+    const [t, m, r, s] = await Promise.all([
+      sb.from('teams').select('*').order('display_order'),
+      sb.from('members').select('*').order('display_order'),
+      sb.from('rounds').select('*').order('round_date'),
+      sb.from('scores').select('*')
+    ]);
+    if (t.error) throw t.error;
+    state.teams   = (t.data || []).map(fromDB.team);
+    state.members = (m.data || []).map(fromDB.member);
+    state.rounds  = (r.data || []).map(fromDB.round);
+    state.scores  = (s.data || []).map(fromDB.score);
     hideLoading();
     render();
   } catch(e) {
-    console.error('Supabase 오류:', e);
-    useLocalData = true;
-    state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    console.error(e);
+    useLocal = true;
+    state = JSON.parse(JSON.stringify(DEFAULTS));
     hideLoading();
     render();
-    showToast('DB 연결 실패 → 로컬 데이터로 표시합니다', 'error');
+    showToast('DB 연결 오류: ' + e.message, 'error');
   }
-}
-
-async function loadFromSupabase() {
-  const [t, m, r, s] = await Promise.all([
-    sb.from('teams').select('*').order('order'),
-    sb.from('members').select('*').order('order'),
-    sb.from('rounds').select('*').order('date'),
-    sb.from('scores').select('*')
-  ]);
-  if (t.error) throw t.error;
-  // 데이터가 없으면 기본 데이터 삽입
-  if (!t.data || t.data.length === 0) {
-    await seedSupabase();
-    return loadFromSupabase();
-  }
-  state.teams = t.data;
-  state.members = m.data || [];
-  state.rounds = r.data || [];
-  state.scores = s.data || [];
-}
-
-async function seedSupabase() {
-  await sb.from('teams').insert(DEFAULT_DATA.teams);
-  await sb.from('members').insert(DEFAULT_DATA.members);
-  await sb.from('rounds').insert(DEFAULT_DATA.rounds);
-  await sb.from('scores').insert(DEFAULT_DATA.scores);
 }
 
 // ═══════════════════════════════════════════
 // 렌더링
 // ═══════════════════════════════════════════
-function render() {
-  renderTeams();
-  renderLeader();
-}
+function render() { renderTeams(); renderLeader(); }
 
 function renderTeams() {
-  const container = document.getElementById('teamsContainer');
-  container.innerHTML = '';
-  for (const team of state.teams) {
-    container.appendChild(buildTeamCard(team));
-  }
+  const c = document.getElementById('teamsContainer');
+  c.innerHTML = '';
+  for (const team of state.teams) c.appendChild(buildTeamCard(team));
 }
 
 function buildTeamCard(team) {
   const members = state.members.filter(m => m.team_id === team.id).sort((a,b) => a.order - b.order);
-  const rounds = state.rounds.filter(r => r.team_id === team.id).sort((a,b) => {
-    const mo = m => parseInt(m.month);
-    if (a.date && b.date) return new Date(a.date) - new Date(b.date);
-    return mo(a.month) - mo(b.month);
-  });
-
+  const rounds = state.rounds
+    .filter(r => r.team_id === team.id)
+    .sort((a,b) => {
+      if (a.date && b.date) return new Date(a.date) - new Date(b.date);
+      return parseInt(a.month) - parseInt(b.month);
+    });
   const card = document.createElement('div');
   card.className = 'team-card';
   card.innerHTML = `
@@ -561,94 +458,81 @@ function buildTeamCard(team) {
         <button class="btn btn-mint" onclick="openRoundModal(${team.id})">+ 라운드 추가</button>
       </div>
     </div>
-    <div class="table-wrap">
-      ${buildTable(team, members, rounds)}
-    </div>
-  `;
+    <div class="table-wrap">${buildTable(team, members, rounds)}</div>`;
   return card;
 }
 
 function buildTable(team, members, rounds) {
-  if (!members.length) return '<p style="padding:20px;color:#ccc">멤버가 없습니다</p>';
+  if (!members.length) return '<p style="padding:20px;color:#ccc">멤버 없음</p>';
 
-  // 컬럼 헤더
   let thead = `<tr><th>월</th>`;
   for (const m of members) thead += `<th>${m.name}</th>`;
   thead += `<th>비고</th><th></th></tr>`;
 
-  // 데이터 행
   let tbody = '';
   if (!rounds.length) {
     tbody = `<tr class="empty-row"><td colspan="${members.length + 3}">아직 라운드 기록이 없습니다 ✨</td></tr>`;
   } else {
     for (const round of rounds) {
-      const scores = state.scores.filter(s => s.round_id === round.id);
       const scoreMap = {};
-      for (const s of scores) scoreMap[s.member_id] = s;
+      state.scores.filter(s => s.round_id === round.id).forEach(s => scoreMap[s.member_id] = s);
 
-      // 이번 라운드 유효 점수들로 순위 계산
-      const validScores = members
-        .map(m => ({ memberId: m.id, score: scoreMap[m.id]?.score }))
+      const valid = members
+        .map(m => ({ id: m.id, score: scoreMap[m.id]?.score }))
         .filter(x => x.score != null)
-        .sort((a, b) => a.score - b.score);
-
-      const rank1Score = validScores[0]?.score;
-      const rank2Score = validScores[1]?.score;
+        .sort((a,b) => a.score - b.score);
+      const rank1 = valid[0]?.score;
+      const rank2 = valid.filter(x => x.score !== rank1)[0]?.score;
 
       let row = `<tr>`;
-      row += `<td class="month-cell editable" ondblclick="editCell(this,'month','${round.id}')">${round.month || '-'}</td>`;
-
+      row += `<td class="month-cell editable" ondblclick="editCell(this,'month',${round.id})">${round.month}</td>`;
       for (const m of members) {
         const sc = scoreMap[m.id];
-        const absent = sc?.absent;
+        const absent = !sc || sc.absent;
         const score = sc?.score;
         let cls = 'editable';
         let display = absent ? '<span class="score-absent">결석</span>' : (score ?? '-');
         if (score != null && !absent) {
-          if (score === rank1Score) cls += ' score-gold';
-          else if (score === rank2Score) cls += ' score-silver';
+          if (score === rank1) cls += ' score-gold';
+          else if (score === rank2) cls += ' score-silver';
         }
-        row += `<td class="${cls}" ondblclick="editCell(this,'score','${round.id}','${m.id}')">${display}</td>`;
+        row += `<td class="${cls}" ondblclick="editCell(this,'score',${round.id},${m.id})">${display}</td>`;
       }
-
-      const note = round.note || '';
-      row += `<td class="note-cell editable" ondblclick="editCell(this,'note','${round.id}')">${note || '<span style="color:#eee">-</span>'}</td>`;
-      row += `<td class="del-cell"><button class="del-btn" onclick="deleteRound(${round.id})" title="삭제">✕</button></td>`;
+      row += `<td class="note-cell editable" ondblclick="editCell(this,'note',${round.id})">${round.note || '<span style="color:#eee">-</span>'}</td>`;
+      row += `<td class="del-cell"><button class="del-btn" onclick="deleteRound(${round.id})">✕</button></td>`;
       row += `</tr>`;
       tbody += row;
     }
   }
 
-  // 집계 행: 1위 횟수
-  const tally1 = computeTally(members, rounds, 1);
-  let tally1Row = `<tr class="tally-row"><td class="tally-label">🥇 1위 횟수</td>`;
-  for (const m of members) tally1Row += `<td>${tally1[m.id] || 0}</td>`;
-  tally1Row += `<td></td><td></td></tr>`;
+  const t1 = computeTally(members, rounds, 1);
+  const t2 = computeTally(members, rounds, 2);
+  let tally1 = `<tr class="tally-row"><td class="tally-label">🥇 1위 횟수</td>`;
+  let tally2 = `<tr class="tally-row"><td class="tally-label">🥈 2위 횟수</td>`;
+  for (const m of members) {
+    tally1 += `<td>${t1[m.id] || 0}</td>`;
+    tally2 += `<td>${t2[m.id] || 0}</td>`;
+  }
+  tally1 += `<td></td><td></td></tr>`;
+  tally2 += `<td></td><td></td></tr>`;
 
-  // 집계 행: 2위 횟수
-  const tally2 = computeTally(members, rounds, 2);
-  let tally2Row = `<tr class="tally-row"><td class="tally-label">🥈 2위 횟수</td>`;
-  for (const m of members) tally2Row += `<td>${tally2[m.id] || 0}</td>`;
-  tally2Row += `<td></td><td></td></tr>`;
-
-  return `<table><thead>${thead}</thead><tbody>${tbody}${tally1Row}${tally2Row}</tbody></table>`;
+  return `<table><thead>${thead}</thead><tbody>${tbody}${tally1}${tally2}</tbody></table>`;
 }
 
 function computeTally(members, rounds, rank) {
   const tally = {};
   for (const round of rounds) {
-    const scores = state.scores.filter(s => s.round_id === round.id);
     const scoreMap = {};
-    for (const s of scores) scoreMap[s.member_id] = s;
+    state.scores.filter(s => s.round_id === round.id).forEach(s => scoreMap[s.member_id] = s);
     const valid = members
       .map(m => ({ id: m.id, score: scoreMap[m.id]?.score }))
       .filter(x => x.score != null)
-      .sort((a, b) => a.score - b.score);
+      .sort((a,b) => a.score - b.score);
     if (rank === 1 && valid[0]) {
       const best = valid[0].score;
       valid.filter(x => x.score === best).forEach(x => { tally[x.id] = (tally[x.id] || 0) + 1; });
-    } else if (rank === 2 && valid[1]) {
-      const best = valid[0]?.score;
+    } else if (rank === 2 && valid.length >= 2) {
+      const best = valid[0].score;
       const second = valid.filter(x => x.score !== best)[0]?.score;
       if (second != null) valid.filter(x => x.score === second).forEach(x => { tally[x.id] = (tally[x.id] || 0) + 1; });
     }
@@ -657,33 +541,19 @@ function computeTally(members, rounds, rank) {
 }
 
 function renderLeader() {
-  // 전체 멤버 1위 횟수 집계
-  const allMemberStats = [];
+  const stats = [];
   for (const m of state.members) {
     const team = state.teams.find(t => t.id === m.team_id);
     const teamRounds = state.rounds.filter(r => r.team_id === m.team_id);
-    const teamMembers = state.members.filter(tm => tm.team_id === m.team_id);
-    const tally1 = computeTally(teamMembers, teamRounds, 1);
-    const tally2 = computeTally(teamMembers, teamRounds, 2);
-    allMemberStats.push({
-      name: m.name, teamName: team?.name,
-      wins: tally1[m.id] || 0,
-      seconds: tally2[m.id] || 0
-    });
+    const teamMembers = state.members.filter(x => x.team_id === m.team_id);
+    const t1 = computeTally(teamMembers, teamRounds, 1);
+    const t2 = computeTally(teamMembers, teamRounds, 2);
+    stats.push({ name: m.name, team: team?.name, wins: t1[m.id] || 0, seconds: t2[m.id] || 0 });
   }
-  allMemberStats.sort((a, b) => b.wins - a.wins || b.seconds - a.seconds);
-
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  if (allMemberStats[0]) {
-    set('leader1-name', allMemberStats[0].name);
-    set('leader1-stat', `🥇 ${allMemberStats[0].wins}회 우승`);
-    set('leader1-team', allMemberStats[0].teamName);
-  }
-  if (allMemberStats[1]) {
-    set('leader2-name', allMemberStats[1].name);
-    set('leader2-stat', `🥇 ${allMemberStats[1].wins}회 우승`);
-    set('leader2-team', allMemberStats[1].teamName);
-  }
+  stats.sort((a,b) => b.wins - a.wins || b.seconds - a.seconds);
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  if (stats[0]) { set('leader1-name', stats[0].name); set('leader1-stat', `🥇 ${stats[0].wins}회 우승`); set('leader1-team', stats[0].team || ''); }
+  if (stats[1]) { set('leader2-name', stats[1].name); set('leader2-stat', `🥇 ${stats[1].wins}회 우승`); set('leader2-team', stats[1].team || ''); }
 }
 
 // ═══════════════════════════════════════════
@@ -691,9 +561,8 @@ function renderLeader() {
 // ═══════════════════════════════════════════
 function editCell(td, type, roundId, memberId) {
   if (td.querySelector('input')) return;
-  const currentText = td.innerText.trim();
   const origHTML = td.innerHTML;
-
+  const currentText = td.innerText.trim();
   const input = document.createElement('input');
   input.className = 'inline-edit';
   if (type === 'score') input.type = 'number';
@@ -702,22 +571,24 @@ function editCell(td, type, roundId, memberId) {
   td.appendChild(input);
   input.focus(); input.select();
 
+  let saved = false;
   const save = async () => {
+    if (saved) return; saved = true;
     const val = input.value.trim();
     if (type === 'score') {
       const score = val === '' ? null : parseInt(val);
-      await upsertScore(parseInt(roundId), parseInt(memberId), score, false);
+      const absent = (val === '');
+      await upsertScore(roundId, memberId, score, absent);
     } else if (type === 'month') {
-      await updateRoundField(parseInt(roundId), 'month', val || origHTML);
+      await updateRoundField(roundId, 'month', val);
     } else if (type === 'note') {
-      await updateRoundField(parseInt(roundId), 'note', val);
+      await updateRoundField(roundId, 'note', val);
     }
     render();
   };
-  const cancel = () => { td.innerHTML = origHTML; };
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); save(); }
-    if (e.key === 'Escape') cancel();
+    if (e.key === 'Escape') { saved = true; td.innerHTML = origHTML; }
   });
   input.addEventListener('blur', save);
 }
@@ -726,29 +597,30 @@ async function upsertScore(roundId, memberId, score, absent) {
   const existing = state.scores.find(s => s.round_id === roundId && s.member_id === memberId);
   if (existing) {
     existing.score = score; existing.absent = absent;
-    if (!useLocalData && sb) {
-      await sb.from('scores').update({ score, absent }).eq('id', existing.id);
-    }
+    if (sb) await sb.from('scores').update({ strokes: absent ? null : score }).eq('id', existing.id);
   } else {
-    const newScore = { id: nextId.scores++, round_id: roundId, member_id: memberId, score, absent };
-    state.scores.push(newScore);
-    if (!useLocalData && sb) {
-      const { data } = await sb.from('scores').insert([{ round_id: roundId, member_id: memberId, score, absent }]).select();
-      if (data?.[0]) newScore.id = data[0].id;
+    const row = { id: nextId(), round_id: roundId, member_id: memberId, score, absent };
+    state.scores.push(row);
+    if (sb) {
+      const { data } = await sb.from('scores').insert([toDB.score(roundId, memberId, score, absent)]).select();
+      if (data?.[0]) row.id = data[0].id;
     }
   }
 }
 
 async function updateRoundField(roundId, field, value) {
   const round = state.rounds.find(r => r.id === roundId);
-  if (round) {
-    round[field] = value;
-    if (!useLocalData && sb) await sb.from('rounds').update({ [field]: value }).eq('id', roundId);
+  if (!round) return;
+  round[field] = value;
+  if (sb) {
+    const dbField = field === 'date' ? 'round_date' : (field === 'month' ? 'month' : field);
+    const dbVal = field === 'month' ? parseInt(value) : value;
+    await sb.from('rounds').update({ [dbField]: dbVal }).eq('id', roundId);
   }
 }
 
 // ═══════════════════════════════════════════
-// 라운드 추가 모달
+// 라운드 추가
 // ═══════════════════════════════════════════
 function openRoundModal(teamId) {
   const team = state.teams.find(t => t.id === teamId);
@@ -758,28 +630,26 @@ function openRoundModal(teamId) {
   document.getElementById('roundMonth').value = '';
   document.getElementById('roundDate').value = '';
   document.getElementById('roundNote').value = '';
-
-  const scoreInputs = document.getElementById('scoreInputs');
-  scoreInputs.innerHTML = '';
+  const si = document.getElementById('scoreInputs');
+  si.innerHTML = '';
   for (const m of members) {
-    scoreInputs.innerHTML += `
+    si.innerHTML += `
       <div class="score-input-item">
         <label>${m.name}</label>
-        <input type="number" id="score_${m.id}" placeholder="타수 입력" min="50" max="200">
+        <input type="number" id="sc_${m.id}" placeholder="타수" min="50" max="200">
         <label class="absent-check">
-          <input type="checkbox" id="absent_${m.id}" onchange="toggleAbsent(${m.id})">
-          비참석
+          <input type="checkbox" id="ab_${m.id}" onchange="toggleAbsent(${m.id})"> 비참석
         </label>
       </div>`;
   }
   openModal('roundModal');
 }
 
-function toggleAbsent(memberId) {
-  const absent = document.getElementById(`absent_${memberId}`).checked;
-  const input = document.getElementById(`score_${memberId}`);
-  input.disabled = absent;
-  if (absent) input.value = '';
+function toggleAbsent(mid) {
+  const ab = document.getElementById(`ab_${mid}`).checked;
+  const inp = document.getElementById(`sc_${mid}`);
+  inp.disabled = ab;
+  if (ab) inp.value = '';
 }
 
 async function saveRound() {
@@ -789,50 +659,49 @@ async function saveRound() {
   const note = document.getElementById('roundNote').value.trim();
   if (!month) { showToast('월을 선택해주세요', 'error'); return; }
 
-  const newRound = { id: nextId.rounds++, team_id: teamId, month, date, note };
-  if (!useLocalData && sb) {
-    const { data, error } = await sb.from('rounds').insert([{ team_id: teamId, month, date, note }]).select();
+  const appRound = { id: nextId(), team_id: teamId, month: month + '월', date, note };
+  if (sb) {
+    const { data, error } = await sb.from('rounds')
+      .insert([{ team_id: teamId, month: parseInt(month), round_date: date, note }]).select();
     if (error) { showToast('저장 실패: ' + error.message, 'error'); return; }
-    if (data?.[0]) newRound.id = data[0].id;
+    if (data?.[0]) appRound.id = data[0].id;
   }
-  state.rounds.push(newRound);
+  state.rounds.push(appRound);
 
   const members = state.members.filter(m => m.team_id === teamId);
   for (const m of members) {
-    const absent = document.getElementById(`absent_${m.id}`)?.checked || false;
-    const val = document.getElementById(`score_${m.id}`)?.value;
+    const absent = document.getElementById(`ab_${m.id}`)?.checked || false;
+    const val = document.getElementById(`sc_${m.id}`)?.value;
     const score = absent ? null : (val ? parseInt(val) : null);
-    if (score !== null || absent) {
-      await upsertScore(newRound.id, m.id, score, absent);
-    }
+    if (score !== null || absent) await upsertScore(appRound.id, m.id, score, absent);
   }
 
   closeModal('roundModal');
   render();
-  showToast('라운드가 추가되었습니다! ⛳', 'success');
+  showToast('라운드 추가 완료! ⛳', 'success');
 }
 
 async function deleteRound(roundId) {
   if (!confirm('이 라운드를 삭제할까요?')) return;
   state.scores = state.scores.filter(s => s.round_id !== roundId);
   state.rounds = state.rounds.filter(r => r.id !== roundId);
-  if (!useLocalData && sb) {
+  if (sb) {
     await sb.from('scores').delete().eq('round_id', roundId);
     await sb.from('rounds').delete().eq('id', roundId);
   }
   render();
-  showToast('라운드가 삭제되었습니다', 'success');
+  showToast('삭제되었습니다', 'success');
 }
 
 // ═══════════════════════════════════════════
-// 설정 모달
+// 설정
 // ═══════════════════════════════════════════
 function openSettingsModal() {
-  const content = document.getElementById('settingsContent');
-  content.innerHTML = '';
+  const c = document.getElementById('settingsContent');
+  c.innerHTML = '';
   for (const team of state.teams) {
     const members = state.members.filter(m => m.team_id === team.id).sort((a,b) => a.order - b.order);
-    content.innerHTML += `
+    c.innerHTML += `
       <div style="margin-bottom:16px">
         <div style="font-weight:700;color:var(--primary);margin-bottom:8px;font-size:0.9rem">
           ${team.order === 1 ? '🌸' : '⛳'} ${team.name}
@@ -840,7 +709,7 @@ function openSettingsModal() {
         ${members.map(m => `
           <div class="settings-member-row">
             <label>${m.order}번</label>
-            <input type="text" id="member_${m.id}" value="${m.name}">
+            <input type="text" id="mn_${m.id}" value="${m.name}">
           </div>`).join('')}
       </div>
       <hr class="divider">`;
@@ -850,51 +719,39 @@ function openSettingsModal() {
 
 async function saveSettings() {
   for (const m of state.members) {
-    const input = document.getElementById(`member_${m.id}`);
-    if (!input) continue;
-    const newName = input.value.trim();
+    const inp = document.getElementById(`mn_${m.id}`);
+    if (!inp) continue;
+    const newName = inp.value.trim();
     if (newName && newName !== m.name) {
       m.name = newName;
-      if (!useLocalData && sb) await sb.from('members').update({ name: newName }).eq('id', m.id);
+      if (sb) await sb.from('members').update({ name: newName }).eq('id', m.id);
     }
   }
   closeModal('settingsModal');
   render();
-  showToast('멤버 이름이 저장되었습니다 ✅', 'success');
+  showToast('저장 완료 ✅', 'success');
 }
 
 // ═══════════════════════════════════════════
 // 유틸
 // ═══════════════════════════════════════════
-function openModal(id) {
-  document.getElementById(id).classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
-  document.body.style.overflow = '';
-}
+function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
 document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
 });
-
 function hideLoading() {
   const el = document.getElementById('loadingOverlay');
   if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }
 }
-
 let toastTimer;
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = type ? `show ${type}` : 'show';
+  t.textContent = msg; t.className = type ? `show ${type}` : 'show';
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = ''; }, 3000);
+  toastTimer = setTimeout(() => { t.className = ''; }, 3200);
 }
 
-// ═══════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════
 init();
 </script>
 </body>

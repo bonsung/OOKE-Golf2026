@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오!오키은 GOLF 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #FFF9F5;
+    --primary: #FF6B35;
+    --secondary: #FFD166;
+    --mint: #06D6A0;
+    --gold: #FFD700;
+    --silver: #C0C0C0;
+    --text: #333;
+    --card-bg: #fff;
+    --border: #f0e0d0;
+    --shadow: 0 4px 20px rgba(255,107,53,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #FF6B35 0%, #ff8c5a 50%, #FFD166 100%);
+    padding: 24px 20px 20px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(255,107,53,0.3);
+  }
+  .header-inner { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .logo-wrap { flex-shrink: 0; }
+  .title-block { text-align: left; }
+  .title-main {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2rem;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    line-height: 1.1;
+  }
+  .title-sub { font-size: 0.85rem; color: rgba(255,255,255,0.85); margin-top: 4px; font-weight: 500; }
+
+  /* ── MAIN ── */
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+  /* ── CARD ── */
+  .team-card {
+    background: var(--card-bg); border-radius: 20px;
+    box-shadow: var(--shadow); margin-bottom: 28px;
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(90deg, #fff5f0, #fff9f5);
+    border-bottom: 2px solid var(--border);
+    flex-wrap: wrap; gap: 8px;
+  }
+  .card-title {
+    font-family: 'Fredoka One', cursive; font-size: 1.3rem;
+    color: var(--primary); display: flex; align-items: center; gap: 8px;
+  }
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    border: none; border-radius: 10px; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; font-weight: 700;
+    padding: 8px 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: #e85d2a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,107,53,0.35); }
+  .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-outline:hover { background: #fff5f0; }
+  .btn-mint { background: var(--mint); color: #fff; }
+  .btn-mint:hover { background: #05bc8e; transform: translateY(-1px); }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; padding: 0 0 4px; }
+  table { width: 100%; border-collapse: collapse; min-width: 520px; }
+  th {
+    background: linear-gradient(135deg, var(--primary), #ff8c5a);
+    color: #fff; font-size: 0.8rem; font-weight: 700;
+    padding: 10px 10px; text-align: center; white-space: nowrap;
+  }
+  td {
+    padding: 9px 10px; text-align: center; font-size: 0.85rem;
+    border-bottom: 1px solid #f5ece4;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fffaf7; }
+
+  .score-gold { color: #c8860a; font-weight: 700; }
+  .score-silver { color: #888; font-weight: 700; }
+  .score-absent { color: #ccc; font-style: italic; font-size: 0.75rem; }
+
+  .tally-row td {
+    background: linear-gradient(90deg, #fffbf0, #fff9f5);
+    font-weight: 700; font-size: 0.82rem;
+    border-top: 2px solid var(--secondary);
+  }
+  .tally-label { font-size: 0.78rem; color: #888; text-align: left; padding-left: 12px; }
+
+  .editable { cursor: pointer; }
+  .editable:hover { background: #fff3ee; border-radius: 4px; }
+  input.inline-edit {
+    width: 100%; border: 2px solid var(--primary); border-radius: 6px;
+    padding: 3px 6px; font-size: 0.85rem; text-align: center;
+    font-family: 'Noto Sans KR', sans-serif; outline: none; background: #fff8f5;
+  }
+
+  .month-cell { font-weight: 700; color: var(--primary); white-space: nowrap; font-size: 0.82rem; }
+  .note-cell { font-size: 0.78rem; color: #999; min-width: 80px; }
+  .del-cell { width: 32px; }
+  .del-btn { background: none; border: none; cursor: pointer; color: #ffb3a0; font-size: 1rem; padding: 2px; line-height: 1; }
+  .del-btn:hover { color: #ff4757; }
+
+  /* ── LEADER ── */
+  .leader-section {
+    background: var(--card-bg); border-radius: 20px;
+    box-shadow: var(--shadow); padding: 24px 20px;
+    border: 1px solid var(--border); margin-top: 8px;
+  }
+  .leader-title {
+    font-family: 'Fredoka One', cursive; font-size: 1.4rem;
+    color: var(--primary); text-align: center; margin-bottom: 20px;
+  }
+  .leader-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .leader-card { border-radius: 14px; padding: 18px 16px; text-align: center; border: 2px solid transparent; }
+  .leader-card.gold-card { background: linear-gradient(135deg, #fffbe6, #fff8d0); border-color: var(--gold); }
+  .leader-card.silver-card { background: linear-gradient(135deg, #f8f8f8, #f0f0f0); border-color: var(--silver); }
+  .leader-medal { font-size: 2rem; margin-bottom: 6px; }
+  .leader-rank { font-size: 0.7rem; font-weight: 700; color: #888; margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .leader-name { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .leader-stat { font-size: 0.75rem; color: #999; margin-top: 4px; }
+  .leader-team { font-size: 0.72rem; color: var(--primary); font-weight: 700; margin-top: 2px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 16px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .modal {
+    background: #fff; border-radius: 20px; padding: 28px 24px;
+    width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    transform: translateY(20px); transition: transform 0.2s;
+  }
+  .modal-overlay.active .modal { transform: translateY(0); }
+  .modal h2 { font-family: 'Fredoka One', cursive; color: var(--primary); font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .form-row { margin-bottom: 14px; }
+  .form-row label { display: block; font-size: 0.8rem; font-weight: 700; color: #666; margin-bottom: 5px; }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; border: 2px solid #f0e0d0; border-radius: 10px;
+    padding: 9px 12px; font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif;
+    outline: none; transition: border-color 0.2s; background: #fffaf7;
+  }
+  .form-row input:focus, .form-row select:focus { border-color: var(--primary); }
+  .score-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .score-input-item label { color: var(--primary); }
+  .absent-check { display: flex; align-items: center; gap: 6px; margin-top: 6px; cursor: pointer; font-size: 0.82rem; color: #888; }
+  .absent-check input[type=checkbox] { accent-color: var(--primary); width: 15px; height: 15px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #333; color: #fff; padding: 11px 22px; border-radius: 30px;
+    font-size: 0.85rem; font-weight: 500; z-index: 9999;
+    transition: transform 0.3s ease; pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.success { background: var(--mint); }
+  #toast.error { background: #ff4757; }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    position: fixed; inset: 0; background: rgba(255,249,245,0.9);
+    display: flex; align-items: center; justify-content: center; z-index: 500;
+    transition: opacity 0.3s;
+  }
+  .spinner { width: 44px; height: 44px; border: 4px solid #ffd166; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .title-main { font-size: 1.5rem; }
+    .leader-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .leader-card { padding: 14px 10px; }
+    .leader-name { font-size: 0.95rem; }
+    .card-header { flex-direction: column; align-items: flex-start; }
+    .modal { padding: 20px 16px; }
+  }
+  @media (max-width: 380px) { .leader-grid { grid-template-columns: 1fr; } }
+
+  .empty-row td { color: #ccc; font-style: italic; padding: 20px; text-align: center; }
+  .badge { display: inline-block; background: var(--secondary); color: #c8860a; border-radius: 20px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700; margin-left: 6px; }
+  .settings-member-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .settings-member-row label { font-size: 0.78rem; color: #888; min-width: 40px; }
+  .settings-member-row input { flex: 1; }
+  .divider { border: none; border-top: 2px dashed #f0e0d0; margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div style="text-align:center">
+    <div class="spinner"></div>
+    <p style="margin-top:12px;color:var(--primary);font-weight:700;font-size:0.9rem">데이터 불러오는 중...</p>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="68" width="72" height="8" rx="4" fill="#4CAF50"/>
+        <path d="M10 68 Q12 63 14 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
+        <path d="M20 68 Q22 62 24 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
+        <path d="M35 68 Q37 61 39 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
+        <path d="M50 68 Q52 63 54 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
+        <path d="M63 68 Q65 64 67 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
+        <circle cx="40" cy="65" r="6" fill="white" stroke="#ddd" stroke-width="1"/>
+        <path d="M36 63 Q38 62 40 63" stroke="#ccc" fill="none" stroke-width="0.8"/>
+        <path d="M40 65 Q42 64 44 65" stroke="#ccc" fill="none" stroke-width="0.8"/>
+        <path d="M37 67 Q39 66 41 67" stroke="#ccc" fill="none" stroke-width="0.8"/>
+        <path d="M40 32 C40 32 30 25 30 19 C30 15 34 12 37 14 C38.5 15 40 17 40 17 C40 17 41.5 15 43 14 C46 12 50 15 50 19 C50 25 40 32 40 32Z" fill="#FF6B9D"/>
+        <circle cx="29" cy="18" r="6" fill="#FFCC80"/>
+        <path d="M23 16 Q26 10 29 12 Q32 10 35 16" fill="#795548"/>
+        <path d="M23 16 Q22 20 24 22" stroke="#795548" fill="none" stroke-width="2"/>
+        <circle cx="27" cy="17" r="1" fill="#795548"/>
+        <circle cx="31" cy="17" r="1" fill="#795548"/>
+        <path d="M27 20 Q29 22 31 20" stroke="#FF6B9D" fill="none" stroke-width="1.2"/>
+        <path d="M24 24 L29 22 L34 24 L36 38 L29 40 L22 38Z" fill="#FF6B9D"/>
+        <path d="M22 33 L18 48 L29 46 L40 48 L36 33Z" fill="#FF8FAB"/>
+        <path d="M34 27 Q37 28 40 30" stroke="#FFCC80" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="51" cy="18" r="6" fill="#FFCC80"/>
+        <path d="M45 15 Q51 10 57 15" fill="#4E342E"/>
+        <circle cx="49" cy="17" r="1" fill="#4E342E"/>
+        <circle cx="53" cy="17" r="1" fill="#4E342E"/>
+        <path d="M49 20 Q51 22 53 20" stroke="#FF6B35" fill="none" stroke-width="1.2"/>
+        <path d="M46 24 L51 22 L56 24 L57 40 L51 42 L45 40Z" fill="#1565C0"/>
+        <path d="M50 24 L51 22 L52 24 L51 36Z" fill="#FF6B35"/>
+        <path d="M46 27 Q43 28 40 30" stroke="#FFCC80" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="15" cy="12" r="1.5" fill="#FFD700" opacity="0.8"/>
+        <circle cx="65" cy="10" r="1.5" fill="#FFD700" opacity="0.8"/>
+        <circle cx="70" cy="22" r="1" fill="#FFD700" opacity="0.6"/>
+        <circle cx="10" cy="25" r="1" fill="#FFD700" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="title-block">
+      <div class="title-main">오!오키은 GOLF 2026</div>
+      <div class="title-sub">⛳ 시즌 리더보드 · 행복한 골프 가족</div>
+    </div>
+    <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.6);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
+  </div>
+</header>
+
+<main>
+  <div id="teamsContainer"></div>
+  <div class="leader-section">
+    <div class="leader-title">🏆 2026 시즌 현재 리더</div>
+    <div class="leader-grid">
+      <div class="leader-card gold-card">
+        <div class="leader-medal">🥇</div>
+        <div class="leader-rank">시즌 1위</div>
+        <div class="leader-name" id="leader1-name">-</div>
+        <div class="leader-stat" id="leader1-stat"></div>
+        <div class="leader-team" id="leader1-team"></div>
+      </div>
+      <div class="leader-card silver-card">
+        <div class="leader-medal">🥈</div>
+        <div class="leader-rank">시즌 2위</div>
+        <div class="leader-name" id="leader2-name">-</div>
+        <div class="leader-stat" id="leader2-stat"></div>
+        <div class="leader-team" id="leader2-team"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<!-- 라운드 추가 모달 -->
+<div class="modal-overlay" id="roundModal">
+  <div class="modal">
+    <h2>⛳ 라운드 추가</h2>
+    <input type="hidden" id="roundTeamId">
+    <div class="form-row">
+      <label>팀</label>
+      <input type="text" id="roundTeamName" readonly style="background:#f5f5f5;color:#888">
+    </div>
+    <div class="form-row">
+      <label>월</label>
+      <select id="roundMonth">
+        <option value="">월 선택</option>
+        <option value="4">4월</option><option value="5">5월</option>
+        <option value="6">6월</option><option value="7">7월</option>
+        <option value="8">8월</option><option value="9">9월</option>
+        <option value="10">10월</option><option value="11">11월</option>
+        <option value="12">12월</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>날짜 (선택)</label>
+      <input type="date" id="roundDate">
+    </div>
+    <div class="form-row">
+      <label>비고 (코스명 등)</label>
+      <input type="text" id="roundNote" placeholder="예: 블루원 리조트">
+    </div>
+    <hr class="divider">
+    <div class="form-row">
+      <label>멤버별 타수 입력</label>
+      <div class="score-inputs" id="scoreInputs"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('roundModal')">취소</button>
+      <button class="btn btn-primary" onclick="saveRound()">💾 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 설정 모달 -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h2>⚙️ 멤버 설정</h2>
+    <div id="settingsContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('settingsModal')">취소</button>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// SUPABASE
+// ═══════════════════════════════════════════
+const SUPABASE_URL = 'https://jmjrhpijooswxkvxagwf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptanJocGlqb29zd3hrdnhhZ3dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2OTQwMjksImV4cCI6MjA4ODI3MDAyOX0.hbkOWNryZvYvrZhnr39GgozAN_MXJgoaZf5KU-CF-4Y';
+const sb = (window.supabase && !SUPABASE_URL.includes('__'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
+
+// ── DB 컬럼 ↔ 앱 내부 포맷 변환 ──────────────
+const fromDB = {
+  team: r => ({ id: r.id, name: r.team_name, order: r.display_order }),
+  member: r => ({ id: r.id, team_id: r.team_id, name: r.name, order: r.display_order }),
+  round: r => ({ id: r.id, team_id: r.team_id, month: r.month + '월', date: r.round_date, note: r.note || '' }),
+  score: r => ({ id: r.id, round_id: r.round_id, member_id: r.member_id, score: r.strokes, absent: r.strokes === null })
+};
+const toDB = {
+  round: a => ({ team_id: a.team_id, month: parseInt(a.month), round_date: a.date || null, note: a.note || '' }),
+  score: (roundId, memberId, score, absent) => ({ round_id: roundId, member_id: memberId, strokes: absent ? null : score })
+};
+
+// ── 상태 ─────────────────────────────────────
+let state = { teams: [], members: [], rounds: [], scores: [] };
+let useLocal = false;
+let _nextId = 100;
+const nextId = () => _nextId++;
+
+// ── 기본 데이터 (DB 미연결 시) ───────────────
+const DEFAULTS = {
+  teams: [
+    { id: 1, name: '1조', order: 1 },
+    { id: 2, name: '2조', order: 2 }
+  ],
+  members: [
+    { id: 1, team_id: 1, name: 'CH Chang', order: 1 },
+    { id: 2, team_id: 1, name: 'Tessie Nam', order: 2 },
+    { id: 3, team_id: 1, name: 'Christina Kim', order: 3 },
+    { id: 4, team_id: 1, name: 'OO2', order: 4 },
+    { id: 5, team_id: 2, name: '梁将锡', order: 1 },
+    { id: 6, team_id: 2, name: '金京喆', order: 2 },
+    { id: 7, team_id: 2, name: '赵相元', order: 3 },
+    { id: 8, team_id: 2, name: '朴钟弼', order: 4 }
+  ],
+  rounds: [],
+  scores: []
+};
+
+// ═══════════════════════════════════════════
+// 초기화
+// ═══════════════════════════════════════════
+async function init() {
+  if (!sb) {
+    useLocal = true;
+    state = JSON.parse(JSON.stringify(DEFAULTS));
+    hideLoading();
+    render();
+    showToast('로컬 모드 (DB 미연결)', 'error');
+    return;
+  }
+  try {
+    const [t, m, r, s] = await Promise.all([
+      sb.from('teams').select('*').order('display_order'),
+      sb.from('members').select('*').order('display_order'),
+      sb.from('rounds').select('*').order('round_date'),
+      sb.from('scores').select('*')
+    ]);
+    if (t.error) throw t.error;
+    state.teams   = (t.data || []).map(fromDB.team);
+    state.members = (m.data || []).map(fromDB.member);
+    state.rounds  = (r.data || []).map(fromDB.round);
+    state.scores  = (s.data || []).map(fromDB.score);
+    hideLoading();
+    render();
+  } catch(e) {
+    console.error(e);
+    useLocal = true;
+    state = JSON.parse(JSON.stringify(DEFAULTS));
+    hideLoading();
+    render();
+    showToast('DB 연결 오류: ' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════
+// 렌더링
+// ═══════════════════════════════════════════
+function render() { renderTeams(); renderLeader(); }
+
+function renderTeams() {
+  const c = document.getElementById('teamsContainer');
+  c.innerHTML = '';
+  for (const team of state.teams) c.appendChild(buildTeamCard(team));
+}
+
+function buildTeamCard(team) {
+  const members = state.members.filter(m => m.team_id === team.id).sort((a,b) => a.order - b.order);
+  const rounds = state.rounds
+    .filter(r => r.team_id === team.id)
+    .sort((a,b) => {
+      if (a.date && b.date) return new Date(a.date) - new Date(b.date);
+      return parseInt(a.month) - parseInt(b.month);
+    });
+  const card = document.createElement('div');
+  card.className = 'team-card';
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-title">
+        ${team.order === 1 ? '🌸' : '⛳'} ${team.name}
+        <span class="badge">${members.length}명</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-mint" onclick="openRoundModal(${team.id})">+ 라운드 추가</button>
+      </div>
+    </div>
+    <div class="table-wrap">${buildTable(team, members, rounds)}</div>`;
+  return card;
+}
+
+function buildTable(team, members, rounds) {
+  if (!members.length) return '<p style="padding:20px;color:#ccc">멤버 없음</p>';
+
+  let thead = `<tr><th>월</th>`;
+  for (const m of members) thead += `<th>${m.name}</th>`;
+  thead += `<th>비고</th><th></th></tr>`;
+
+  let tbody = '';
+  if (!rounds.length) {
+    tbody = `<tr class="empty-row"><td colspan="${members.length + 3}">아직 라운드 기록이 없습니다 ✨</td></tr>`;
+  } else {
+    for (const round of rounds) {
+      const scoreMap = {};
+      state.scores.filter(s => s.round_id === round.id).forEach(s => scoreMap[s.member_id] = s);
+
+      const valid = members
+        .map(m => ({ id: m.id, score: scoreMap[m.id]?.score }))
+        .filter(x => x.score != null)
+        .sort((a,b) => a.score - b.score);
+      const rank1 = valid[0]?.score;
+      const rank2 = valid.filter(x => x.score !== rank1)[0]?.score;
+
+      let row = `<tr>`;
+      row += `<td class="month-cell editable" ondblclick="editCell(this,'month',${round.id})">${round.month}</td>`;
+      for (const m of members) {
+        const sc = scoreMap[m.id];
+        const absent = !sc || sc.absent;
+        const score = sc?.score;
+        let cls = 'editable';
+        let display = absent ? '<span class="score-absent">결석</span>' : (score ?? '-');
+        if (score != null && !absent) {
+          if (score === rank1) cls += ' score-gold';
+          else if (score === rank2) cls += ' score-silver';
+        }
+        row += `<td class="${cls}" ondblclick="editCell(this,'score',${round.id},${m.id})">${display}</td>`;
+      }
+      row += `<td class="note-cell editable" ondblclick="editCell(this,'note',${round.id})">${round.note || '<span style="color:#eee">-</span>'}</td>`;
+      row += `<td class="del-cell"><button class="del-btn" onclick="deleteRound(${round.id})">✕</button></td>`;
+      row += `</tr>`;
+      tbody += row;
+    }
+  }
+
+  const t1 = computeTally(members, rounds, 1);
+  const t2 = computeTally(members, rounds, 2);
+  let tally1 = `<tr class="tally-row"><td class="tally-label">🥇 1위 횟수</td>`;
+  let tally2 = `<tr class="tally-row"><td class="tally-label">🥈 2위 횟수</td>`;
+  for (const m of members) {
+    tally1 += `<td>${t1[m.id] || 0}</td>`;
+    tally2 += `<td>${t2[m.id] || 0}</td>`;
+  }
+  tally1 += `<td></td><td></td></tr>`;
+  tally2 += `<td></td><td></td></tr>`;
+
+  return `<table><thead>${thead}</thead><tbody>${tbody}${tally1}${tally2}</tbody></table>`;
+}
+
+function computeTally(members, rounds, rank) {
+  const tally = {};
+  for (const round of rounds) {
+    const scoreMap = {};
+    state.scores.filter(s => s.round_id === round.id).forEach(s => scoreMap[s.member_id] = s);
+    const valid = members
+      .map(m => ({ id: m.id, score: scoreMap[m.id]?.score }))
+      .filter(x => x.score != null)
+      .sort((a,b) => a.score - b.score);
+    if (rank === 1 && valid[0]) {
+      const best = valid[0].score;
+      valid.filter(x => x.score === best).forEach(x => { tally[x.id] = (tally[x.id] || 0) + 1; });
+    } else if (rank === 2 && valid.length >= 2) {
+      const best = valid[0].score;
+      const second = valid.filter(x => x.score !== best)[0]?.score;
+      if (second != null) valid.filter(x => x.score === second).forEach(x => { tally[x.id] = (tally[x.id] || 0) + 1; });
+    }
+  }
+  return tally;
+}
+
+function renderLeader() {
+  const stats = [];
+  for (const m of state.members) {
+    const team = state.teams.find(t => t.id === m.team_id);
+    const teamRounds = state.rounds.filter(r => r.team_id === m.team_id);
+    const teamMembers = state.members.filter(x => x.team_id === m.team_id);
+    const t1 = computeTally(teamMembers, teamRounds, 1);
+    const t2 = computeTally(teamMembers, teamRounds, 2);
+    stats.push({ name: m.name, team: team?.name, wins: t1[m.id] || 0, seconds: t2[m.id] || 0 });
+  }
+  stats.sort((a,b) => b.wins - a.wins || b.seconds - a.seconds);
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  if (stats[0]) { set('leader1-name', stats[0].name); set('leader1-stat', `🥇 ${stats[0].wins}회 우승`); set('leader1-team', stats[0].team || ''); }
+  if (stats[1]) { set('leader2-name', stats[1].name); set('leader2-stat', `🥇 ${stats[1].wins}회 우승`); set('leader2-team', stats[1].team || ''); }
+}
+
+// ═══════════════════════════════════════════
+// 인라인 편집
+// ═══════════════════════════════════════════
+function editCell(td, type, roundId, memberId) {
+  if (td.querySelector('input')) return;
+  const origHTML = td.innerHTML;
+  const currentText = td.innerText.trim();
+  const input = document.createElement('input');
+  input.className = 'inline-edit';
+  if (type === 'score') input.type = 'number';
+  input.value = (type === 'score' && (currentText === '-' || currentText === '결석')) ? '' : currentText;
+  td.innerHTML = '';
+  td.appendChild(input);
+  input.focus(); input.select();
+
+  let saved = false;
+  const save = async () => {
+    if (saved) return; saved = true;
+    const val = input.value.trim();
+    if (type === 'score') {
+      const score = val === '' ? null : parseInt(val);
+      const absent = (val === '');
+      await upsertScore(roundId, memberId, score, absent);
+    } else if (type === 'month') {
+      await updateRoundField(roundId, 'month', val);
+    } else if (type === 'note') {
+      await updateRoundField(roundId, 'note', val);
+    }
+    render();
+  };
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); save(); }
+    if (e.key === 'Escape') { saved = true; td.innerHTML = origHTML; }
+  });
+  input.addEventListener('blur', save);
+}
+
+async function upsertScore(roundId, memberId, score, absent) {
+  const existing = state.scores.find(s => s.round_id === roundId && s.member_id === memberId);
+  if (existing) {
+    existing.score = score; existing.absent = absent;
+    if (sb) await sb.from('scores').update({ strokes: absent ? null : score }).eq('id', existing.id);
+  } else {
+    const row = { id: nextId(), round_id: roundId, member_id: memberId, score, absent };
+    state.scores.push(row);
+    if (sb) {
+      const { data } = await sb.from('scores').insert([toDB.score(roundId, memberId, score, absent)]).select();
+      if (data?.[0]) row.id = data[0].id;
+    }
+  }
+}
+
+async function updateRoundField(roundId, field, value) {
+  const round = state.rounds.find(r => r.id === roundId);
+  if (!round) return;
+  round[field] = value;
+  if (sb) {
+    const dbField = field === 'date' ? 'round_date' : (field === 'month' ? 'month' : field);
+    const dbVal = field === 'month' ? parseInt(value) : value;
+    await sb.from('rounds').update({ [dbField]: dbVal }).eq('id', roundId);
+  }
+}
+
+// ═══════════════════════════════════════════
+// 라운드 추가
+// ═══════════════════════════════════════════
+function openRoundModal(teamId) {
+  const team = state.teams.find(t => t.id === teamId);
+  const members = state.members.filter(m => m.team_id === teamId).sort((a,b) => a.order - b.order);
+  document.getElementById('roundTeamId').value = teamId;
+  document.getElementById('roundTeamName').value = team?.name || '';
+  document.getElementById('roundMonth').value = '';
+  document.getElementById('roundDate').value = '';
+  document.getElementById('roundNote').value = '';
+  const si = document.getElementById('scoreInputs');
+  si.innerHTML = '';
+  for (const m of members) {
+    si.innerHTML += `
+      <div class="score-input-item">
+        <label>${m.name}</label>
+        <input type="number" id="sc_${m.id}" placeholder="타수" min="50" max="200">
+        <label class="absent-check">
+          <input type="checkbox" id="ab_${m.id}" onchange="toggleAbsent(${m.id})"> 비참석
+        </label>
+      </div>`;
+  }
+  openModal('roundModal');
+}
+
+function toggleAbsent(mid) {
+  const ab = document.getElementById(`ab_${mid}`).checked;
+  const inp = document.getElementById(`sc_${mid}`);
+  inp.disabled = ab;
+  if (ab) inp.value = '';
+}
+
+async function saveRound() {
+  const teamId = parseInt(document.getElementById('roundTeamId').value);
+  const month = document.getElementById('roundMonth').value;
+  const date = document.getElementById('roundDate').value || null;
+  const note = document.getElementById('roundNote').value.trim();
+  if (!month) { showToast('월을 선택해주세요', 'error'); return; }
+
+  const appRound = { id: nextId(), team_id: teamId, month: month + '월', date, note };
+  if (sb) {
+    const { data, error } = await sb.from('rounds')
+      .insert([{ team_id: teamId, month: parseInt(month), round_date: date, note }]).select();
+    if (error) { showToast('저장 실패: ' + error.message, 'error'); return; }
+    if (data?.[0]) appRound.id = data[0].id;
+  }
+  state.rounds.push(appRound);
+
+  const members = state.members.filter(m => m.team_id === teamId);
+  for (const m of members) {
+    const absent = document.getElementById(`ab_${m.id}`)?.checked || false;
+    const val = document.getElementById(`sc_${m.id}`)?.value;
+    const score = absent ? null : (val ? parseInt(val) : null);
+    if (score !== null || absent) await upsertScore(appRound.id, m.id, score, absent);
+  }
+
+  closeModal('roundModal');
+  render();
+  showToast('라운드 추가 완료! ⛳', 'success');
+}
+
+async function deleteRound(roundId) {
+  if (!confirm('이 라운드를 삭제할까요?')) return;
+  state.scores = state.scores.filter(s => s.round_id !== roundId);
+  state.rounds = state.rounds.filter(r => r.id !== roundId);
+  if (sb) {
+    await sb.from('scores').delete().eq('round_id', roundId);
+    await sb.from('rounds').delete().eq('id', roundId);
+  }
+  render();
+  showToast('삭제되었습니다', 'success');
+}
+
+// ═══════════════════════════════════════════
+// 설정
+// ═══════════════════════════════════════════
+function openSettingsModal() {
+  const c = document.getElementById('settingsContent');
+  c.innerHTML = '';
+  for (const team of state.teams) {
+    const members = state.members.filter(m => m.team_id === team.id).sort((a,b) => a.order - b.order);
+    c.innerHTML += `
+      <div style="margin-bottom:16px">
+        <div style="font-weight:700;color:var(--primary);margin-bottom:8px;font-size:0.9rem">
+          ${team.order === 1 ? '🌸' : '⛳'} ${team.name}
+        </div>
+        ${members.map(m => `
+          <div class="settings-member-row">
+            <label>${m.order}번</label>
+            <input type="text" id="mn_${m.id}" value="${m.name}">
+          </div>`).join('')}
+      </div>
+      <hr class="divider">`;
+  }
+  openModal('settingsModal');
+}
+
+async function saveSettings() {
+  for (const m of state.members) {
+    const inp = document.getElementById(`mn_${m.id}`);
+    if (!inp) continue;
+    const newName = inp.value.trim();
+    if (newName && newName !== m.name) {
+      m.name = newName;
+      if (sb) await sb.from('members').update({ name: newName }).eq('id', m.id);
+    }
+  }
+  closeModal('settingsModal');
+  render();
+  showToast('저장 완료 ✅', 'success');
+}
+
+// ═══════════════════════════════════════════
+// 유틸
+// ═══════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+function hideLoading() {
+  const el = document.getElementById('loadingOverlay');
+  if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }
+}
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type ? `show ${type}` : 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ''; }, 3200);
+}
+
+init();
+</script>
+</body>
+</html>

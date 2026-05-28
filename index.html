@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>오!오키은 GOLF 2026</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
@@ -47,6 +48,17 @@
     color: #fff; letter-spacing: -0.5px; line-height: 1.1;
   }
   .title-sub { font-size: 0.82rem; color: rgba(255,255,255,0.8); margin-top: 3px; font-weight: 400; }
+  .title-slogan {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem; color: rgba(255,255,255,0.92);
+    letter-spacing: 0.5px; line-height: 1.1; white-space: nowrap;
+  }
+  .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .header-motto {
+    display: flex; align-items: center; gap: 7px;
+    color: rgba(255,255,255,0.92); font-size: 0.78rem; font-weight: 700;
+    white-space: nowrap; letter-spacing: 0.3px;
+  }
 
   /* ── MAIN ── */
   main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
@@ -295,11 +307,61 @@
         <path d="M46 27 Q43 28 40 30" stroke="#FFCC80" fill="none" stroke-width="3" stroke-linecap="round"/>
       </svg>
       <div>
-        <div class="title-main">오!오키은 GOLF 2026</div>
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <div class="title-main">오!오키은 GOLF 2026</div>
+          <div class="title-slogan">健康！幸福！</div>
+        </div>
         <div class="title-sub">⛳ 시즌 리더보드 · 행복한 골프 가족</div>
       </div>
     </div>
-    <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
+    <div class="header-right">
+      <div class="header-motto">
+        成功，成功，大成功
+        <!-- 두 손 펼침 SVG (10손가락) -->
+        <svg width="52" height="32" viewBox="0 0 52 32" xmlns="http://www.w3.org/2000/svg">
+          <!-- 왼손 (손바닥 앞) -->
+          <g fill="#FFDBA4">
+            <!-- 손바닥 -->
+            <rect x="2" y="18" width="17" height="11" rx="3"/>
+            <!-- 새끼손가락 -->
+            <rect x="2.5" y="11" width="3.5" height="9" rx="1.8"/>
+            <!-- 약지 -->
+            <rect x="7" y="7" width="3.5" height="13" rx="1.8"/>
+            <!-- 중지 -->
+            <rect x="11.5" y="5" width="3.5" height="15" rx="1.8"/>
+            <!-- 검지 -->
+            <rect x="16" y="7" width="3.5" height="13" rx="1.8"/>
+            <!-- 엄지 (비스듬) -->
+            <rect x="18.5" y="17" width="3" height="8" rx="1.5" transform="rotate(25,20,21)"/>
+          </g>
+          <!-- 손가락 구분선 흰색 -->
+          <line x1="7" y1="8" x2="7" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
+          <line x1="11.5" y1="6" x2="11.5" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
+          <line x1="16" y1="8" x2="16" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
+
+          <!-- 오른손 (손바닥 앞, 좌우 대칭) -->
+          <g fill="#FFDBA4">
+            <!-- 손바닥 -->
+            <rect x="33" y="18" width="17" height="11" rx="3"/>
+            <!-- 새끼손가락 -->
+            <rect x="46" y="11" width="3.5" height="9" rx="1.8"/>
+            <!-- 약지 -->
+            <rect x="41.5" y="7" width="3.5" height="13" rx="1.8"/>
+            <!-- 중지 -->
+            <rect x="37" y="5" width="3.5" height="15" rx="1.8"/>
+            <!-- 검지 -->
+            <rect x="32.5" y="7" width="3.5" height="13" rx="1.8"/>
+            <!-- 엄지 (비스듬) -->
+            <rect x="29.5" y="17" width="3" height="8" rx="1.5" transform="rotate(-25,31,21)"/>
+          </g>
+          <!-- 오른손 손가락 구분선 -->
+          <line x1="45" y1="8" x2="45" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
+          <line x1="40.5" y1="6" x2="40.5" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
+          <line x1="36" y1="8" x2="36" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
+        </svg>
+      </div>
+      <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
+    </div>
   </div>
 </header>
 

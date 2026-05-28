@@ -108,7 +108,7 @@
 
   .score-gold   { color: var(--gold); font-weight: 800; }
   .score-silver { color: var(--silver); font-weight: 700; }
-  .score-absent { color: #B0BEC5; font-style: italic; font-size: 0.74rem; }
+  .score-absent { color: #8FA8BC; font-style: normal; font-size: 0.84rem; font-weight: 600; }
 
   .tally-row td {
     background: #EBF4FC; font-weight: 700; font-size: 0.8rem;
@@ -122,17 +122,21 @@
   .del-btn    { background: none; border: none; cursor: pointer; color: #B0BEC5; font-size: 0.9rem; line-height: 1; }
   .del-btn:hover { color: #E05555; }
 
-  /* 비공식 뱃지 */
+  /* 공식/비공식 뱃지 (클릭 토글 가능) */
   .badge-unofficial {
     display: inline-block; background: #EBF0F5; color: var(--text2);
     border-radius: 6px; padding: 1px 7px; font-size: 0.68rem; font-weight: 700;
     border: 1px solid #C9D8E8; margin-left: 4px; vertical-align: middle;
+    cursor: pointer; transition: all 0.18s; user-select: none;
   }
+  .badge-unofficial:hover { background: #D6E4F0; color: var(--primary); }
   .badge-official {
     display: inline-block; background: rgba(44,95,138,0.1); color: var(--primary);
     border-radius: 6px; padding: 1px 7px; font-size: 0.68rem; font-weight: 700;
     border: 1px solid var(--light); margin-left: 4px; vertical-align: middle;
+    cursor: pointer; transition: all 0.18s; user-select: none;
   }
+  .badge-official:hover { background: rgba(44,95,138,0.2); }
 
   /* 인라인 편집 */
   .editable { cursor: pointer; }
@@ -205,7 +209,22 @@
   /* 설정 모달 멤버 행 */
   .member-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
   .member-row label { font-size: 0.76rem; color: var(--text2); min-width: 36px; font-weight: 600; }
-  .member-row input { flex: 1; }
+  .member-row input {
+    flex: 1; border: none; border-bottom: 1px solid #D0E0EC;
+    border-radius: 0; background: transparent;
+    padding: 6px 4px; font-size: 0.88rem;
+    font-family: 'Pretendard', sans-serif; outline: none;
+    color: var(--text); transition: border-color 0.18s;
+  }
+  .member-row input:focus { border-bottom: 1.5px solid #5BA4CF; }
+  .btn-del-member {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #E8F0F8; color: #2C5F8A;
+    border: none; cursor: pointer; font-size: 0.85rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.18s; font-weight: 700; line-height: 1;
+  }
+  .btn-del-member:hover { background: #FF6B6B; color: #fff; }
   .add-member-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
   .add-member-row input { flex: 1; border: 1.5px dashed var(--accent); border-radius: 10px; padding: 8px 12px; font-size: 0.85rem; font-family: 'Pretendard', sans-serif; outline: none; background: #F0F7FD; color: var(--text); }
   .add-member-row input:focus { border-style: solid; border-color: var(--primary); background: #fff; }
@@ -502,8 +521,8 @@ function buildTable(team, members, rounds) {
 
       let row = `<tr>`;
       const officialBadge = round.is_official
-        ? `<span class="badge-official">공식</span>`
-        : `<span class="badge-unofficial">비공식</span>`;
+        ? `<span class="badge-official" onclick="toggleOfficial(${round.id});event.stopPropagation()" title="클릭해서 비공식으로 변경">공식</span>`
+        : `<span class="badge-unofficial" onclick="toggleOfficial(${round.id});event.stopPropagation()" title="클릭해서 공식으로 변경">비공식</span>`;
       row += `<td class="month-cell editable" ondblclick="editCell(this,'month',${round.id})">${round.month}${officialBadge}</td>`;
 
       for (const m of members) {
@@ -511,7 +530,7 @@ function buildTable(team, members, rounds) {
         const absent = !sc || sc.absent;
         const score = sc?.score;
         let cls = 'editable';
-        let display = absent ? '<span class="score-absent">결석</span>' : (score ?? '-');
+        let display = absent ? '<span class="score-absent">·</span>' : (score ?? '-');
         if (score != null && !absent && round.is_official) {
           if (score === rank1) cls += ' score-gold';
           else if (score === rank2) cls += ' score-silver';
@@ -587,7 +606,7 @@ function editCell(td, type, roundId, memberId) {
   const input = document.createElement('input');
   input.className = 'inline-edit';
   if (type === 'score') input.type = 'number';
-  input.value = (type === 'score' && (currentText === '-' || currentText === '결석')) ? '' : currentText;
+  input.value = (type === 'score' && (currentText === '-' || currentText === '·' || currentText === '결석')) ? '' : currentText;
   td.innerHTML = ''; td.appendChild(input);
   input.focus(); input.select();
 
@@ -637,6 +656,15 @@ async function updateRoundField(roundId, field, value) {
     const dbVal   = field === 'month' ? parseInt(value) : value;
     await sb.from('rounds').update({ [dbField]: dbVal }).eq('id', roundId);
   }
+}
+
+async function toggleOfficial(roundId) {
+  const round = state.rounds.find(r => r.id === roundId);
+  if (!round) return;
+  round.is_official = !round.is_official;
+  if (sb) await sb.from('rounds').update({ is_official: round.is_official }).eq('id', roundId);
+  render();
+  showToast(round.is_official ? '✅ 공식 경기로 변경됨' : '비공식으로 변경됨', 'success');
 }
 
 // ═══════════════════════════════════════════
@@ -742,7 +770,7 @@ function renderSettingsContent() {
         <div class="member-row" id="mrow_${m.id}">
           <label>${m.order}</label>
           <input type="text" id="mn_${m.id}" value="${m.name}">
-          <button class="btn btn-danger btn-sm" onclick="deleteMember(${m.id},'${m.name}')">삭제</button>
+          <button class="btn-del-member" onclick="deleteMember(${m.id},'${m.name}')" title="멤버 삭제">×</button>
         </div>`).join('')}
       <div class="add-member-row" id="addrow_${team.id}">
         <input type="text" id="newmember_${team.id}" placeholder="+ 멤버 이름 입력">

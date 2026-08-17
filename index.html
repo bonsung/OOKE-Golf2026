@@ -424,7 +424,7 @@
           <line x1="36" y1="8" x2="36" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
         </svg>
       </div>
-      <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
+      <button class="btn btn-outline" id="settingsBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
       <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="handleLogout()">🚪 로그아웃</button>
     </div>
   </div>
@@ -588,13 +588,14 @@ async function handleLogin() {
   if (!sb) { errEl.textContent = 'DB 연결 오류입니다'; return; }
 
   const hash = await sha256(password);
-  const { data, error } = await sb.from('golf_users').select('id,email,password_hash').eq('email', email).maybeSingle();
+  const { data, error } = await sb.from('golf_users').select('id,email,password_hash,is_admin').eq('email', email).maybeSingle();
   if (error || !data || data.password_hash !== hash) {
     errEl.textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
     return;
   }
   localStorage.setItem('golf_email', email);
   localStorage.setItem('golf_session', email);
+  localStorage.setItem('golf_is_admin', data.is_admin ? '1' : '0');
   enterApp();
 }
 
@@ -618,11 +619,13 @@ async function handleSignup() {
 
   localStorage.setItem('golf_email', email);
   localStorage.setItem('golf_session', email);
+  localStorage.setItem('golf_is_admin', '0');
   enterApp();
 }
 
 function handleLogout() {
   localStorage.removeItem('golf_session');
+  localStorage.removeItem('golf_is_admin');
   document.getElementById('appContainer').style.display = 'none';
   document.getElementById('authScreen').style.display = 'flex';
   showLogin();
@@ -630,17 +633,24 @@ function handleLogout() {
   document.getElementById('loginPassword').value = '';
 }
 
+function isAdmin() { return localStorage.getItem('golf_is_admin') === '1'; }
+
 function enterApp() {
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('appContainer').style.display = '';
+  document.getElementById('settingsBtn').style.display = isAdmin() ? '' : 'none';
   init();
 }
 
-function checkSession() {
+async function checkSession() {
   const savedEmail = localStorage.getItem('golf_email');
   if (savedEmail) document.getElementById('loginEmail').value = savedEmail;
   const session = localStorage.getItem('golf_session');
   if (session) {
+    if (localStorage.getItem('golf_is_admin') === null && sb) {
+      const { data } = await sb.from('golf_users').select('is_admin').eq('email', session).maybeSingle();
+      localStorage.setItem('golf_is_admin', data?.is_admin ? '1' : '0');
+    }
     enterApp();
   } else {
     document.getElementById('authScreen').style.display = 'flex';
@@ -705,9 +715,9 @@ function buildTeamCard(team) {
     <div class="card-header">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <div class="card-title">${team.order===1?'🌸':'⛳'} ${team.name}<span class="badge-cnt">${members.length}명</span></div>
-        <span class="card-hint">💡 셀을 더블클릭하면 바로 수정 가능</span>
+        ${isAdmin() ? '<span class="card-hint">💡 셀을 더블클릭하면 바로 수정 가능</span>' : ''}
       </div>
-      <button class="btn btn-accent btn-sm" onclick="openRoundModal(${team.id})">+ 라운드 추가</button>
+      ${isAdmin() ? `<button class="btn btn-accent btn-sm" onclick="openRoundModal(${team.id})">+ 라운드 추가</button>` : ''}
     </div>
     <div class="table-wrap">${buildTable(team, members, rounds)}</div>`;
   return card;
@@ -746,16 +756,19 @@ function buildTable(team, members, rounds) {
         const sc = scoreMap[m.id];
         const absent = !sc || sc.absent;
         const score = sc?.score;
-        let cls = 'editable';
+        let cls = isAdmin() ? 'editable' : '';
         let display = absent ? '<span class="score-absent">·</span>' : (score ?? '-');
         if (score != null && !absent && round.is_official) {
           if (score === rank1) cls += ' score-gold';
           else if (score === rank2) cls += ' score-silver';
         }
-        row += `<td class="${cls}" ondblclick="editCell(this,'score',${round.id},${m.id})">${display}</td>`;
+        const scoreDbl = isAdmin() ? `ondblclick="editCell(this,'score',${round.id},${m.id})"` : '';
+        row += `<td class="${cls}" ${scoreDbl}>${display}</td>`;
       }
-      row += `<td class="note-cell editable" ondblclick="editCell(this,'note',${round.id})">${round.note || '<span style="color:#D6E4F0">-</span>'}</td>`;
-      row += `<td class="del-cell"><button class="del-btn" onclick="deleteRound(${round.id})" title="삭제">✕</button></td>`;
+      const noteCls = isAdmin() ? 'note-cell editable' : 'note-cell';
+      const noteDbl = isAdmin() ? `ondblclick="editCell(this,'note',${round.id})"` : '';
+      row += `<td class="${noteCls}" ${noteDbl}>${round.note || '<span style="color:#D6E4F0">-</span>'}</td>`;
+      row += `<td class="del-cell">${isAdmin() ? `<button class="del-btn" onclick="deleteRound(${round.id})" title="삭제">✕</button>` : ''}</td>`;
       row += `</tr>`;
       tbody += row;
     }

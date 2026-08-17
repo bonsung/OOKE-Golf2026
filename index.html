@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>오!오키은 GOLF 2026</title>
+<title>오!오키은 GOLF</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -62,6 +62,25 @@
 
   /* ── MAIN ── */
   main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+  /* ── YEAR TABS ── */
+  .year-tabs {
+    max-width: 960px; margin: 0 auto; padding: 14px 16px 0;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .year-tab {
+    padding: 7px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; border: 1.5px solid var(--border); background: #fff; color: var(--text2);
+    transition: all 0.18s; user-select: none;
+  }
+  .year-tab:hover { border-color: var(--accent); color: var(--primary); }
+  .year-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .year-tab-add {
+    padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; border: 1.5px dashed var(--accent); background: rgba(91,164,207,0.08); color: var(--accent);
+    transition: all 0.18s; user-select: none;
+  }
+  .year-tab-add:hover { background: rgba(91,164,207,0.18); }
 
   /* ── CARD ── */
   .team-card {
@@ -308,7 +327,7 @@
       <circle cx="40" cy="65" r="6" fill="white" stroke="#ddd" stroke-width="1"/>
       <path d="M40 32 C40 32 30 25 30 19 C30 15 34 12 37 14 C38.5 15 40 17 40 17 C40 17 41.5 15 43 14 C46 12 50 15 50 19 C50 25 40 32 40 32Z" fill="#2C5F8A"/>
     </svg>
-    <div class="auth-title">오!오키은 GOLF 2026</div>
+    <div class="auth-title">오!오키은 GOLF</div>
     <div class="auth-sub">⛳ 시즌 리더보드</div>
 
     <div id="loginForm">
@@ -372,7 +391,7 @@
       </svg>
       <div>
         <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
-          <div class="title-main">오!오키은 GOLF 2026</div>
+          <div class="title-main">오!오키은 GOLF</div>
           <div class="title-slogan">健康！幸福！</div>
         </div>
         <div class="title-sub">⛳ 시즌 리더보드 · 행복한 골프 가족</div>
@@ -431,10 +450,12 @@
   </div>
 </header>
 
+<div class="year-tabs" id="yearTabs"></div>
+
 <main>
   <div id="teamsContainer"></div>
   <div class="leader-section">
-    <div class="leader-title">🏆 2026 시즌 현재 리더</div>
+    <div class="leader-title">🏆 <span id="leaderYearLabel">2026</span> 시즌 현재 리더</div>
     <div class="leader-sub">※ 공식 경기 기준</div>
     <div class="leader-grid">
       <div class="leader-card gold-card">
@@ -541,6 +562,22 @@
   </div>
 </div>
 
+<!-- 새 시즌 추가 모달 -->
+<div class="modal-overlay" id="newSeasonModal">
+  <div class="modal">
+    <h2>🆕 새 시즌 추가</h2>
+    <div class="form-row">
+      <label>연도</label>
+      <input type="number" id="newSeasonYear" placeholder="예: 2027">
+    </div>
+    <div class="auth-error" id="newSeasonError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('newSeasonModal')">취소</button>
+      <button class="btn btn-primary" onclick="confirmNewSeason()">추가</button>
+    </div>
+  </div>
+</div>
+
 <!-- 수정 이력 모달 -->
 <div class="modal-overlay" id="historyModal">
   <div class="modal" style="max-width:640px">
@@ -570,7 +607,8 @@ const fromDB = {
     id: r.id, team_id: r.team_id,
     month: r.month + '월', date: r.round_date,
     note: r.note || '',
-    is_official: r.is_official !== false
+    is_official: r.is_official !== false,
+    year: r.year
   }),
   score: r => ({ id: r.id, round_id: r.round_id, member_id: r.member_id, score: r.strokes, absent: r.strokes === null })
 };
@@ -580,6 +618,8 @@ let state = { teams: [], members: [], rounds: [], scores: [] };
 let useLocal = false;
 let _id = 200;
 const nid = () => _id++;
+let selectedYear = null;
+let pendingYears = [];
 
 const DEFAULTS = {
   teams:   [{ id:1,name:'1조',order:1 },{ id:2,name:'2조',order:2 }],
@@ -726,9 +766,54 @@ async function init() {
 }
 
 // ═══════════════════════════════════════════
+// 연도 시즌 탭
+// ═══════════════════════════════════════════
+function getYears() {
+  const set = new Set(state.rounds.map(r => r.year).filter(y => y != null));
+  pendingYears.forEach(y => set.add(y));
+  return Array.from(set).sort((a,b) => a - b);
+}
+
+function renderYearTabs() {
+  const years = getYears();
+  if (!selectedYear || !years.includes(selectedYear)) {
+    selectedYear = years.length ? years[years.length - 1] : new Date().getFullYear();
+  }
+  const c = document.getElementById('yearTabs');
+  let html = years.map(y => `<div class="year-tab${y === selectedYear ? ' active' : ''}" onclick="selectYear(${y})">${y}</div>`).join('');
+  if (isAdmin()) html += `<div class="year-tab-add" onclick="openNewSeasonModal()">+ 새 시즌</div>`;
+  c.innerHTML = html;
+}
+
+function selectYear(y) {
+  selectedYear = y;
+  render();
+}
+
+function openNewSeasonModal() {
+  const years = getYears();
+  const next = years.length ? Math.max(...years) + 1 : new Date().getFullYear();
+  document.getElementById('newSeasonYear').value = next;
+  document.getElementById('newSeasonError').textContent = '';
+  openModal('newSeasonModal');
+}
+
+function confirmNewSeason() {
+  const val = parseInt(document.getElementById('newSeasonYear').value);
+  const errEl = document.getElementById('newSeasonError');
+  if (!val || val < 2000 || val > 2100) { errEl.textContent = '올바른 연도를 입력해주세요'; return; }
+  if (getYears().includes(val)) { errEl.textContent = '이미 존재하는 시즌입니다'; return; }
+  pendingYears.push(val);
+  selectedYear = val;
+  closeModal('newSeasonModal');
+  render();
+  showToast(`${val} 시즌이 추가되었습니다`, 'success');
+}
+
+// ═══════════════════════════════════════════
 // 렌더링
 // ═══════════════════════════════════════════
-function render() { renderTeams(); renderLeader(); }
+function render() { renderYearTabs(); renderTeams(); renderLeader(); }
 
 function renderTeams() {
   const c = document.getElementById('teamsContainer');
@@ -738,7 +823,7 @@ function renderTeams() {
 
 function buildTeamCard(team) {
   const members = state.members.filter(m => m.team_id === team.id).sort((a,b) => a.order - b.order);
-  const rounds  = state.rounds.filter(r => r.team_id === team.id).sort((a,b) => {
+  const rounds  = state.rounds.filter(r => r.team_id === team.id && r.year === selectedYear).sort((a,b) => {
     if (a.date && b.date) return new Date(a.date) - new Date(b.date);
     return parseInt(a.month) - parseInt(b.month);
   });
@@ -844,10 +929,12 @@ function computeTally(members, rounds, rank) {
 }
 
 function renderLeader() {
+  const yearLabel = document.getElementById('leaderYearLabel');
+  if (yearLabel) yearLabel.textContent = selectedYear;
   const stats = [];
   for (const m of state.members) {
     const team = state.teams.find(t => t.id === m.team_id);
-    const teamRounds  = state.rounds.filter(r => r.team_id === m.team_id && r.is_official);
+    const teamRounds  = state.rounds.filter(r => r.team_id === m.team_id && r.is_official && r.year === selectedYear);
     const teamMembers = state.members.filter(x => x.team_id === m.team_id);
     const t1 = computeTally(teamMembers, teamRounds, 1);
     const t2 = computeTally(teamMembers, teamRounds, 2);
@@ -1054,10 +1141,10 @@ async function saveRound() {
 
   if (!month) { showToast('월을 선택해주세요', 'error'); return; }
 
-  const appRound = { id: nid(), team_id: teamId, month: month+'월', date, note, is_official: isOfficial };
+  const appRound = { id: nid(), team_id: teamId, month: month+'월', date, note, is_official: isOfficial, year: selectedYear };
   if (sb) {
     const { data, error } = await sb.from('rounds')
-      .insert([{ team_id: teamId, month: parseInt(month), round_date: date, note, is_official: isOfficial }]).select();
+      .insert([{ team_id: teamId, month: parseInt(month), round_date: date, note, is_official: isOfficial, year: selectedYear }]).select();
     if (error) { showToast('저장 실패: ' + error.message, 'error'); return; }
     if (data?.[0]) appRound.id = data[0].id;
   }

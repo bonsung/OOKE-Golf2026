@@ -238,6 +238,16 @@
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
   .divider { border: none; border-top: 1.5px dashed var(--border); margin: 14px 0; }
 
+  /* 설정 모달 탭 */
+  .settings-tabs { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 1.5px solid var(--border); }
+  .settings-tab {
+    flex: 1; padding: 10px 12px; background: none; border: none; cursor: pointer;
+    font-family: 'Pretendard', sans-serif; font-size: 0.86rem; font-weight: 700; color: var(--text2);
+    border-bottom: 2.5px solid transparent; margin-bottom: -1.5px; transition: all 0.18s;
+  }
+  .settings-tab:hover { color: var(--primary); }
+  .settings-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
   /* 설정 모달 멤버 행 */
   .member-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
   .member-row label { font-size: 0.76rem; color: var(--text2); min-width: 36px; font-weight: 600; }
@@ -598,12 +608,19 @@
 
 <!-- 설정 모달 -->
 <div class="modal-overlay" id="settingsModal">
-  <div class="modal">
-    <h2>⚙️ 멤버 설정</h2>
-    <div id="settingsContent"></div>
+  <div class="modal" style="max-width:620px">
+    <h2>⚙️ 설정</h2>
+    <div class="settings-tabs">
+      <button class="settings-tab active" id="tabUsersBtn" onclick="switchSettingsTab('users')">👥 회원 관리</button>
+      <button class="settings-tab" id="tabMembersBtn" onclick="switchSettingsTab('members')">⚙️ 멤버 설정</button>
+    </div>
+    <div id="usersTabContent"></div>
+    <div id="membersTabContent" style="display:none">
+      <div id="settingsContent"></div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('settingsModal')">닫기</button>
-      <button class="btn btn-primary" onclick="saveSettings()">💾 저장</button>
+      <button class="btn btn-primary" id="settingsSaveBtn" onclick="saveSettings()">💾 저장</button>
     </div>
   </div>
 </div>
@@ -700,6 +717,7 @@ let pendingYears = [];
 let boardPosts = [];
 let boardComments = [];
 let currentPostId = null;
+let allUsers = [];
 
 const DEFAULTS = {
   teams:   [{ id:1,name:'1조',order:1 },{ id:2,name:'2조',order:2 }],
@@ -741,10 +759,10 @@ async function handleLogin() {
 
   const hash = await sha256(password);
   const { data, error } = await sb.from('golf_users').select('id,email,password_hash,is_admin').eq('email', email).maybeSingle();
-  if (error || !data || data.password_hash !== hash) {
-    errEl.textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
-    return;
-  }
+  if (error) { errEl.textContent = 'DB 오류입니다: ' + error.message; return; }
+  if (!data) { errEl.textContent = '등록되지 않은 계정입니다'; return; }
+  if (data.password_hash !== hash) { errEl.textContent = '이메일 또는 비밀번호가 올바르지 않습니다'; return; }
+
   localStorage.setItem('golf_email', email);
   localStorage.setItem('golf_session', email);
   localStorage.setItem('golf_is_admin', data.is_admin ? '1' : '0');
@@ -1446,8 +1464,80 @@ async function deleteRound(roundId) {
 // 설정 (멤버 추가/삭제 포함)
 // ═══════════════════════════════════════════
 function openSettingsModal() {
-  renderSettingsContent();
+  switchSettingsTab('users');
   openModal('settingsModal');
+}
+
+function switchSettingsTab(tab) {
+  const isUsers = tab === 'users';
+  document.getElementById('tabUsersBtn').classList.toggle('active', isUsers);
+  document.getElementById('tabMembersBtn').classList.toggle('active', !isUsers);
+  document.getElementById('usersTabContent').style.display = isUsers ? '' : 'none';
+  document.getElementById('membersTabContent').style.display = isUsers ? 'none' : '';
+  document.getElementById('settingsSaveBtn').style.display = isUsers ? 'none' : '';
+  if (isUsers) renderUsersTab(); else renderSettingsContent();
+}
+
+async function renderUsersTab() {
+  const c = document.getElementById('usersTabContent');
+  c.innerHTML = '<p style="padding:16px;color:#8A9BA8">불러오는 중...</p>';
+  if (!sb) { c.innerHTML = '<p style="padding:16px;color:#8A9BA8">DB 연결 오류입니다</p>'; return; }
+
+  const { data, error } = await sb.from('golf_users').select('*').order('created_at', { ascending: true });
+  if (error) { c.innerHTML = `<p style="padding:16px;color:#E05555">불러오기 실패: ${error.message}</p>`; return; }
+  allUsers = data || [];
+  const myEmail = localStorage.getItem('golf_session');
+
+  const rows = allUsers.map((u, i) => {
+    const isSelf = u.email === myEmail;
+    const dt = u.created_at ? new Date(u.created_at).toLocaleDateString('ko-KR') : '-';
+    const roleLabel = u.is_admin
+      ? '<span class="badge-official">관리자</span>'
+      : '<span class="badge-unofficial">일반</span>';
+    let actions;
+    if (isSelf) {
+      actions = '<span style="color:#B0BEC5;font-size:0.76rem">본인 계정</span>';
+    } else if (u.is_admin) {
+      actions = `<button class="btn btn-outline btn-sm" onclick="demoteUser(${u.id})">일반으로 강등</button>
+                 <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">삭제</button>`;
+    } else {
+      actions = `<button class="btn btn-accent btn-sm" onclick="promoteUser(${u.id})">관리자 승격</button>
+                 <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">삭제</button>`;
+    }
+    return `<tr>
+      <td>${i + 1}</td>
+      <td style="text-align:left">${escapeHtml(u.email)}</td>
+      <td>${dt}</td>
+      <td>${roleLabel}</td>
+      <td style="white-space:nowrap">${actions}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" style="color:#B0BEC5;padding:20px">회원이 없습니다</td></tr>';
+
+  c.innerHTML = `<div class="table-wrap"><table><thead><tr><th>순번</th><th style="text-align:left">이메일</th><th>가입일</th><th>권한</th><th>관리</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+async function promoteUser(id) {
+  const { error } = await sb.from('golf_users').update({ is_admin: true }).eq('id', id);
+  if (error) { showToast('실패: ' + error.message, 'error'); return; }
+  renderUsersTab();
+  showToast('관리자로 승격했습니다 ✅', 'success');
+}
+
+async function demoteUser(id) {
+  const { error } = await sb.from('golf_users').update({ is_admin: false }).eq('id', id);
+  if (error) { showToast('실패: ' + error.message, 'error'); return; }
+  renderUsersTab();
+  showToast('일반 회원으로 변경했습니다', 'success');
+}
+
+async function deleteUser(id) {
+  const u = allUsers.find(x => x.id === id);
+  if (!u) return;
+  if (!confirm(`'${u.email}' 계정을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`)) return;
+  const { error } = await sb.from('golf_users').delete().eq('id', id);
+  if (error) { showToast('삭제 실패: ' + error.message, 'error'); return; }
+  renderUsersTab();
+  showToast('계정이 삭제되었습니다', 'success');
 }
 
 function renderSettingsContent() {

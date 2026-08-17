@@ -85,6 +85,10 @@
   }
   .year-tab:hover { border-color: var(--accent); color: var(--primary); }
   .year-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .year-tab-del {
+    margin-left: 7px; font-weight: 800; opacity: 0.75; cursor: pointer;
+  }
+  .year-tab-del:hover { opacity: 1; color: #FFB4B4; }
   .year-tab-add {
     padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
     cursor: pointer; border: 1.5px dashed var(--accent); background: rgba(91,164,207,0.08); color: var(--accent);
@@ -813,12 +817,11 @@ const fromDB = {
 };
 
 // ── 상태 ─────────────────────────────────
-let state = { teams: [], members: [], rounds: [], scores: [] };
+let state = { teams: [], members: [], rounds: [], scores: [], seasons: [] };
 let useLocal = false;
 let _id = 200;
 const nid = () => _id++;
 let selectedYear = null;
-let pendingYears = [];
 let boardPosts = [];
 let boardComments = [];
 let currentPostId = null;
@@ -832,7 +835,8 @@ const DEFAULTS = {
     { id:5,team_id:2,name:'梁将锡',order:1 },{ id:6,team_id:2,name:'金京喆',order:2 },
     { id:7,team_id:2,name:'赵相元',order:3 },{ id:8,team_id:2,name:'朴钟弼',order:4 }
   ],
-  rounds: [], scores: []
+  rounds: [], scores: [],
+  seasons: [{ id: 1, year: 2026 }]
 };
 
 // ═══════════════════════════════════════════
@@ -1247,6 +1251,17 @@ async function init() {
     state.members = (m.data || []).map(fromDB.member);
     state.rounds  = (r.data || []).map(fromDB.round);
     state.scores  = (s.data || []).map(fromDB.score);
+
+    try {
+      const { data: seasonData, error: seasonErr } = await sb.from('seasons').select('*').order('year');
+      if (seasonErr) throw seasonErr;
+      state.seasons = (seasonData || []).map(x => ({ id: x.id, year: x.year }));
+    } catch (e) {
+      console.warn('seasons 테이블을 찾을 수 없어 rounds 기준으로 연도를 대체합니다:', e.message);
+      const years = Array.from(new Set(state.rounds.map(r => r.year).filter(y => y != null)));
+      state.seasons = years.map(y => ({ year: y }));
+    }
+
     hideLoading(); render();
   } catch(e) {
     console.error(e);
@@ -1261,9 +1276,7 @@ async function init() {
 // 연도 시즌 탭
 // ═══════════════════════════════════════════
 function getYears() {
-  const set = new Set(state.rounds.map(r => r.year).filter(y => y != null));
-  pendingYears.forEach(y => set.add(y));
-  return Array.from(set).sort((a,b) => a - b);
+  return Array.from(new Set(state.seasons.map(s => s.year))).sort((a,b) => a - b);
 }
 
 function renderYearTabs() {
@@ -1272,7 +1285,13 @@ function renderYearTabs() {
     selectedYear = years.length ? years[years.length - 1] : new Date().getFullYear();
   }
   const c = document.getElementById('yearTabs');
-  let html = years.map(y => `<div class="year-tab${y === selectedYear ? ' active' : ''}" onclick="selectYear(${y})">${y}</div>`).join('');
+  let html = years.map(y => {
+    const isActive = y === selectedYear;
+    const delBtn = (isActive && isAdmin())
+      ? `<span class="year-tab-del" onclick="event.stopPropagation();deleteSeason(${y})" title="시즌 삭제">×</span>`
+      : '';
+    return `<div class="year-tab${isActive ? ' active' : ''}" onclick="selectYear(${y})">${y}${delBtn}</div>`;
+  }).join('');
   if (isAdmin()) html += `<div class="year-tab-add" onclick="openNewSeasonModal()">+ 새 시즌</div>`;
   c.innerHTML = html;
 }
@@ -1290,16 +1309,42 @@ function openNewSeasonModal() {
   openModal('newSeasonModal');
 }
 
-function confirmNewSeason() {
+async function confirmNewSeason() {
   const val = parseInt(document.getElementById('newSeasonYear').value);
   const errEl = document.getElementById('newSeasonError');
   if (!val || val < 2000 || val > 2100) { errEl.textContent = '올바른 연도를 입력해주세요'; return; }
   if (getYears().includes(val)) { errEl.textContent = '이미 존재하는 시즌입니다'; return; }
-  pendingYears.push(val);
+
+  if (sb) {
+    const { data, error } = await sb.from('seasons').insert([{ year: val }]).select();
+    if (error) { errEl.textContent = '추가 실패: ' + error.message; return; }
+    state.seasons.push({ id: data?.[0]?.id, year: val });
+  } else {
+    state.seasons.push({ year: val });
+  }
   selectedYear = val;
   closeModal('newSeasonModal');
   render();
   showToast(`${val} 시즌이 추가되었습니다`, 'success');
+}
+
+async function deleteSeason(year) {
+  const hasData = state.rounds.some(r => r.year === year);
+  if (hasData) {
+    showToast('해당 시즌에 라운드 데이터가 있어 삭제할 수 없습니다', 'error');
+    return;
+  }
+  if (!confirm(`${year} 시즌을 삭제하시겠습니까?`)) return;
+
+  if (sb) {
+    const { error } = await sb.from('seasons').delete().eq('year', year);
+    if (error) { showToast('삭제 실패: ' + error.message, 'error'); return; }
+  }
+  state.seasons = state.seasons.filter(s => s.year !== year);
+  const years = getYears();
+  selectedYear = years.length ? years[years.length - 1] : new Date().getFullYear();
+  render();
+  showToast('시즌이 삭제되었습니다', 'success');
 }
 
 // ═══════════════════════════════════════════

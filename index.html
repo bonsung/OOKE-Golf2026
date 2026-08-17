@@ -241,6 +241,23 @@
   .add-member-row input { flex: 1; border: 1.5px dashed var(--accent); border-radius: 10px; padding: 8px 12px; font-size: 0.85rem; font-family: 'Pretendard', sans-serif; outline: none; background: #F0F7FD; color: var(--text); }
   .add-member-row input:focus { border-style: solid; border-color: var(--primary); background: #fff; }
 
+  /* ── AUTH ── */
+  .auth-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #2C5F8A, #5BA4CF); padding: 20px;
+  }
+  .auth-card {
+    background: #fff; border-radius: 20px; box-shadow: 0 24px 64px rgba(20,40,60,0.25);
+    padding: 34px 30px; width: 100%; max-width: 380px; text-align: center;
+  }
+  .auth-title { font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-top: 10px; }
+  .auth-sub { font-size: 0.78rem; color: var(--text2); margin-bottom: 22px; }
+  .auth-card .form-row { text-align: left; }
+  .auth-error { color: #E05555; font-size: 0.78rem; min-height: 16px; margin: 2px 0 12px; text-align: left; font-weight: 600; }
+  .auth-switch { margin-top: 16px; font-size: 0.8rem; color: var(--text2); }
+  .auth-switch a { color: var(--accent); font-weight: 700; cursor: pointer; text-decoration: none; }
+  .auth-switch a:hover { text-decoration: underline; }
+
   /* ── TOAST ── */
   #toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(70px);
@@ -282,6 +299,53 @@
   </div>
 </div>
 
+<!-- 로그인/회원가입 화면 -->
+<div class="auth-screen" id="authScreen" style="display:none">
+  <div class="auth-card">
+    <svg width="52" height="52" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="margin:0 auto;display:block">
+      <rect x="4" y="68" width="72" height="8" rx="4" fill="#4CAF50"/>
+      <path d="M10 68 Q12 63 14 68M20 68 Q22 62 24 68M35 68 Q37 61 39 68M50 68 Q52 63 54 68M63 68 Q65 64 67 68" stroke="#66BB6A" fill="none" stroke-width="1.5"/>
+      <circle cx="40" cy="65" r="6" fill="white" stroke="#ddd" stroke-width="1"/>
+      <path d="M40 32 C40 32 30 25 30 19 C30 15 34 12 37 14 C38.5 15 40 17 40 17 C40 17 41.5 15 43 14 C46 12 50 15 50 19 C50 25 40 32 40 32Z" fill="#2C5F8A"/>
+    </svg>
+    <div class="auth-title">오!오키은 GOLF 2026</div>
+    <div class="auth-sub">⛳ 시즌 리더보드</div>
+
+    <div id="loginForm">
+      <div class="form-row">
+        <label>이메일</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
+      </div>
+      <div class="form-row">
+        <label>비밀번호</label>
+        <input type="password" id="loginPassword" placeholder="비밀번호" onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <div class="auth-error" id="loginError"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="handleLogin()">로그인</button>
+      <div class="auth-switch">계정이 없으신가요? <a onclick="showSignup()">회원가입</a></div>
+    </div>
+
+    <div id="signupForm" style="display:none">
+      <div class="form-row">
+        <label>이메일</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com">
+      </div>
+      <div class="form-row">
+        <label>비밀번호 (6자리 이상)</label>
+        <input type="password" id="signupPassword" placeholder="비밀번호">
+      </div>
+      <div class="form-row">
+        <label>비밀번호 확인</label>
+        <input type="password" id="signupPasswordConfirm" placeholder="비밀번호 확인" onkeydown="if(event.key==='Enter')handleSignup()">
+      </div>
+      <div class="auth-error" id="signupError"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="handleSignup()">회원가입</button>
+      <div class="auth-switch">이미 계정이 있으신가요? <a onclick="showLogin()">로그인</a></div>
+    </div>
+  </div>
+</div>
+
+<div id="appContainer" style="display:none">
 <header>
   <div class="header-inner">
     <div class="header-left">
@@ -361,6 +425,7 @@
         </svg>
       </div>
       <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
+      <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="handleLogout()">🚪 로그아웃</button>
     </div>
   </div>
 </header>
@@ -388,6 +453,7 @@
     </div>
   </div>
 </main>
+</div>
 
 <div id="toast"></div>
 
@@ -493,6 +559,95 @@ const DEFAULTS = {
   ],
   rounds: [], scores: []
 };
+
+// ═══════════════════════════════════════════
+// 인증 (golf_users 테이블 직접 구현)
+// ═══════════════════════════════════════════
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function showLogin() {
+  document.getElementById('loginForm').style.display = '';
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('loginError').textContent = '';
+}
+function showSignup() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = '';
+  document.getElementById('signupError').textContent = '';
+}
+
+async function handleLogin() {
+  const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const errEl    = document.getElementById('loginError');
+  errEl.textContent = '';
+  if (!email || !password) { errEl.textContent = '이메일과 비밀번호를 입력해주세요'; return; }
+  if (!sb) { errEl.textContent = 'DB 연결 오류입니다'; return; }
+
+  const hash = await sha256(password);
+  const { data, error } = await sb.from('golf_users').select('id,email,password_hash').eq('email', email).maybeSingle();
+  if (error || !data || data.password_hash !== hash) {
+    errEl.textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
+    return;
+  }
+  localStorage.setItem('golf_email', email);
+  localStorage.setItem('golf_session', email);
+  enterApp();
+}
+
+async function handleSignup() {
+  const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
+  const confirm  = document.getElementById('signupPasswordConfirm').value;
+  const errEl    = document.getElementById('signupError');
+  errEl.textContent = '';
+  if (!email || !password || !confirm) { errEl.textContent = '모든 항목을 입력해주세요'; return; }
+  if (password.length < 6) { errEl.textContent = '비밀번호는 6자리 이상이어야 합니다'; return; }
+  if (password !== confirm) { errEl.textContent = '비밀번호가 일치하지 않습니다'; return; }
+  if (!sb) { errEl.textContent = 'DB 연결 오류입니다'; return; }
+
+  const { data: existing } = await sb.from('golf_users').select('id').eq('email', email).maybeSingle();
+  if (existing) { errEl.textContent = '이미 가입된 이메일입니다'; return; }
+
+  const hash = await sha256(password);
+  const { error } = await sb.from('golf_users').insert([{ email, password_hash: hash }]);
+  if (error) { errEl.textContent = '가입 실패: ' + error.message; return; }
+
+  localStorage.setItem('golf_email', email);
+  localStorage.setItem('golf_session', email);
+  enterApp();
+}
+
+function handleLogout() {
+  localStorage.removeItem('golf_session');
+  document.getElementById('appContainer').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+  showLogin();
+  document.getElementById('loginEmail').value = localStorage.getItem('golf_email') || '';
+  document.getElementById('loginPassword').value = '';
+}
+
+function enterApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = '';
+  init();
+}
+
+function checkSession() {
+  const savedEmail = localStorage.getItem('golf_email');
+  if (savedEmail) document.getElementById('loginEmail').value = savedEmail;
+  const session = localStorage.getItem('golf_session');
+  if (session) {
+    enterApp();
+  } else {
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'none';
+    hideLoading();
+  }
+}
 
 // ═══════════════════════════════════════════
 // 초기화
@@ -911,7 +1066,7 @@ function showToast(msg, type='') {
   toastTimer = setTimeout(()=>{ t.className=''; }, 3200);
 }
 
-init();
+checkSession();
 </script>
 </body>
 </html>

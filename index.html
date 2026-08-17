@@ -35,11 +35,11 @@
   /* ── HEADER ── */
   header {
     background: linear-gradient(135deg, #2C5F8A, #5BA4CF);
-    padding: 22px 20px 18px;
     box-shadow: 0 4px 16px rgba(44,95,138,0.25);
   }
   .header-inner {
     max-width: 960px; margin: 0 auto;
+    padding: 20px 20px 16px;
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   }
   .header-left { display: flex; align-items: center; gap: 14px; }
@@ -58,6 +58,15 @@
     display: flex; align-items: center; gap: 7px;
     color: rgba(255,255,255,0.92); font-size: 0.78rem; font-weight: 700;
     white-space: nowrap; letter-spacing: 0.3px;
+  }
+  .header-actions {
+    background: rgba(30,58,82,0.4);
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .header-actions-inner {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 20px; min-height: 36px;
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
   }
 
   /* ── MAIN ── */
@@ -528,10 +537,14 @@
           <line x1="36" y1="8" x2="36" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
         </svg>
       </div>
-      <button class="btn btn-outline" id="myInfoBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openMyInfoModal()">🔑 내 정보</button>
-      <button class="btn btn-outline" id="settingsBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
-      <button class="btn btn-outline" id="historyBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openHistoryModal()">📋 수정이력</button>
-      <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="handleLogout()">🚪 로그아웃</button>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div class="header-actions-inner">
+      <button class="btn btn-outline btn-sm" id="myInfoBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openMyInfoModal()">🔑 내 정보</button>
+      <button class="btn btn-outline btn-sm" id="settingsBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
+      <button class="btn btn-outline btn-sm" id="historyBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openHistoryModal()">📋 수정이력</button>
+      <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="handleLogout()">🚪 로그아웃</button>
     </div>
   </div>
 </header>

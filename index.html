@@ -425,6 +425,7 @@
         </svg>
       </div>
       <button class="btn btn-outline" id="settingsBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
+      <button class="btn btn-outline" id="historyBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openHistoryModal()">📋 수정이력</button>
       <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="handleLogout()">🚪 로그아웃</button>
     </div>
   </div>
@@ -516,6 +517,37 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('settingsModal')">닫기</button>
       <button class="btn btn-primary" onclick="saveSettings()">💾 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 점수 수정 사유 모달 -->
+<div class="modal-overlay" id="reasonModal">
+  <div class="modal">
+    <h2>✏️ 수정 사유를 입력해주세요</h2>
+    <div class="form-row">
+      <label>변경 내용</label>
+      <div id="reasonChangeInfo" style="font-size:0.95rem;font-weight:700;color:var(--primary);padding:10px 12px;background:#F0F6FC;border-radius:10px;"></div>
+    </div>
+    <div class="form-row">
+      <label>사유</label>
+      <textarea id="reasonInput" rows="3" placeholder="예: 스코어카드 오기재 정정"></textarea>
+    </div>
+    <div class="auth-error" id="reasonError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cancelReasonModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmReasonModal()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 수정 이력 모달 -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal" style="max-width:640px">
+    <h2>📋 점수 수정 이력</h2>
+    <div id="historyContent" class="table-wrap" style="max-height:60vh;overflow-y:auto"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('historyModal')">닫기</button>
     </div>
   </div>
 </div>
@@ -639,6 +671,7 @@ function enterApp() {
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('appContainer').style.display = '';
   document.getElementById('settingsBtn').style.display = isAdmin() ? '' : 'none';
+  document.getElementById('historyBtn').style.display = isAdmin() ? '' : 'none';
   init();
 }
 
@@ -847,6 +880,17 @@ function editCell(td, type, roundId, memberId) {
     if (type === 'score') {
       const absent = val === '';
       const score  = absent ? null : parseInt(val);
+      const ex = state.scores.find(s => s.round_id === roundId && s.member_id === memberId);
+      const oldScore = ex && !ex.absent ? ex.score : null;
+      if (oldScore !== score) {
+        const oldDisplay = oldScore != null ? oldScore : '결석/미기록';
+        const newDisplay = score != null ? score : '결석/미기록';
+        const reason = await askEditReason(oldDisplay, newDisplay);
+        if (reason === null) { td.innerHTML = origHTML; return; }
+        const member  = state.members.find(m => m.id === memberId);
+        const logged  = await logScoreChange(roundId, memberId, member?.name || '', oldScore, score, reason);
+        if (!logged) { td.innerHTML = origHTML; return; }
+      }
       await upsertScore(roundId, memberId, score, absent);
     } else if (type === 'month') {
       await updateRoundField(roundId, 'month', val);
@@ -875,6 +919,72 @@ async function upsertScore(roundId, memberId, score, absent) {
       if (data?.[0]) row.id = data[0].id;
     }
   }
+}
+
+// ═══════════════════════════════════════════
+// 점수 수정 사유 / 이력
+// ═══════════════════════════════════════════
+let _reasonResolve = null;
+
+function askEditReason(oldDisplay, newDisplay) {
+  return new Promise(resolve => {
+    _reasonResolve = resolve;
+    document.getElementById('reasonChangeInfo').textContent = `이전값: ${oldDisplay} → 새값: ${newDisplay}`;
+    document.getElementById('reasonInput').value = '';
+    document.getElementById('reasonError').textContent = '';
+    openModal('reasonModal');
+    setTimeout(() => document.getElementById('reasonInput').focus(), 50);
+  });
+}
+
+function cancelReasonModal() {
+  closeModal('reasonModal');
+  if (_reasonResolve) { _reasonResolve(null); _reasonResolve = null; }
+}
+
+function confirmReasonModal() {
+  const reason = document.getElementById('reasonInput').value.trim();
+  if (!reason) { document.getElementById('reasonError').textContent = '사유를 입력해주세요'; return; }
+  closeModal('reasonModal');
+  if (_reasonResolve) { _reasonResolve(reason); _reasonResolve = null; }
+}
+
+async function logScoreChange(roundId, memberId, memberName, oldScore, newScore, reason) {
+  if (!sb) return true;
+  const { error } = await sb.from('score_logs').insert([{
+    round_id: roundId, member_id: memberId, member_name: memberName,
+    old_strokes: oldScore, new_strokes: newScore, reason
+  }]);
+  if (error) { showToast('이력 저장 실패: ' + error.message, 'error'); return false; }
+  return true;
+}
+
+async function openHistoryModal() {
+  const content = document.getElementById('historyContent');
+  content.innerHTML = '<p style="padding:16px;color:#8A9BA8">불러오는 중...</p>';
+  openModal('historyModal');
+  if (!sb) { content.innerHTML = '<p style="padding:16px;color:#8A9BA8">DB 연결 오류입니다</p>'; return; }
+
+  const { data, error } = await sb.from('score_logs').select('*').order('modified_at', { ascending: false });
+  if (error) { content.innerHTML = `<p style="padding:16px;color:#E05555">불러오기 실패: ${error.message}</p>`; return; }
+  if (!data || !data.length) { content.innerHTML = '<p style="padding:16px;color:#8A9BA8">수정 이력이 없습니다</p>'; return; }
+
+  let rows = '';
+  for (const log of data) {
+    const dt = log.modified_at
+      ? new Date(log.modified_at).toLocaleString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })
+      : '-';
+    const oldV = log.old_strokes ?? '결석/미기록';
+    const newV = log.new_strokes ?? '결석/미기록';
+    rows += `<tr>
+      <td style="white-space:nowrap;font-size:0.76rem">${dt}</td>
+      <td>${log.member_name || ''}</td>
+      <td>${oldV}</td>
+      <td>${newV}</td>
+      <td style="text-align:left;font-size:0.8rem">${log.reason || ''}</td>
+    </tr>`;
+  }
+  content.innerHTML = `<table><thead><tr><th>날짜</th><th>이름</th><th>이전값</th><th>새값</th><th>사유</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 async function updateRoundField(roundId, field, value) {
@@ -1065,7 +1175,11 @@ async function saveSettings() {
 function openModal(id)  { document.getElementById(id).classList.add('active');    document.body.style.overflow='hidden'; }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow=''; }
 document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target===el) closeModal(el.id); });
+  el.addEventListener('click', e => {
+    if (e.target !== el) return;
+    if (el.id === 'reasonModal') cancelReasonModal();
+    else closeModal(el.id);
+  });
 });
 function hideLoading() {
   const el = document.getElementById('loadingOverlay');

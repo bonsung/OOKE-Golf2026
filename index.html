@@ -402,9 +402,16 @@
       <div class="auth-error" id="loginError"></div>
       <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="handleLogin()">로그인</button>
       <div class="auth-switch">계정이 없으신가요? <a onclick="showSignup()">회원가입</a></div>
+      <p style="font-size:0.72rem;color:#B0BEC5;margin-top:14px;line-height:1.5">
+        비밀번호를 잊으셨나요? 회원가입에서 동일한 이메일로 재가입하시면 비밀번호를 재설정할 수 있습니다.
+      </p>
     </div>
 
     <div id="signupForm" style="display:none">
+      <div class="form-row">
+        <label>이름</label>
+        <input type="text" id="signupName" placeholder="이름을 입력하세요">
+      </div>
       <div class="form-row">
         <label>이메일</label>
         <input type="email" id="signupEmail" placeholder="you@example.com">
@@ -420,6 +427,24 @@
       <div class="auth-error" id="signupError"></div>
       <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="handleSignup()">회원가입</button>
       <div class="auth-switch">이미 계정이 있으신가요? <a onclick="showLogin()">로그인</a></div>
+    </div>
+
+    <div id="resetForm" style="display:none">
+      <div class="form-row">
+        <label>이름 (기존 등록 이름과 일치해야 합니다)</label>
+        <input type="text" id="resetName" placeholder="이름을 입력하세요">
+      </div>
+      <div class="form-row">
+        <label>새 비밀번호 (6자리 이상)</label>
+        <input type="password" id="resetPassword" placeholder="새 비밀번호">
+      </div>
+      <div class="form-row">
+        <label>새 비밀번호 확인</label>
+        <input type="password" id="resetPasswordConfirm" placeholder="새 비밀번호 확인" onkeydown="if(event.key==='Enter')handlePasswordReset()">
+      </div>
+      <div class="auth-error" id="resetError"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="handlePasswordReset()">비밀번호 재설정</button>
+      <div class="auth-switch">취소하고 <a onclick="showLogin()">로그인</a>으로 돌아가기</div>
     </div>
   </div>
 </div>
@@ -503,6 +528,7 @@
           <line x1="36" y1="8" x2="36" y2="18" stroke="white" stroke-width="0.7" opacity="0.55"/>
         </svg>
       </div>
+      <button class="btn btn-outline" id="myInfoBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openMyInfoModal()">🔑 내 정보</button>
       <button class="btn btn-outline" id="settingsBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
       <button class="btn btn-outline" id="historyBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openHistoryModal()">📋 수정이력</button>
       <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="handleLogout()">🚪 로그아웃</button>
@@ -602,6 +628,39 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('roundModal')">취소</button>
       <button class="btn btn-primary" onclick="saveRound()">💾 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 내 정보 모달 -->
+<div class="modal-overlay" id="myInfoModal">
+  <div class="modal">
+    <h2>🔑 내 정보</h2>
+    <div class="form-row">
+      <label>이메일</label>
+      <input type="text" id="myInfoEmail" readonly style="background:#EEF2F6;color:#8A9BA8">
+    </div>
+    <div class="form-row">
+      <label>이름</label>
+      <input type="text" id="myInfoName" placeholder="이름을 입력하세요">
+    </div>
+    <hr class="divider">
+    <div class="form-row">
+      <label>현재 비밀번호</label>
+      <input type="password" id="myInfoCurrentPw" placeholder="현재 비밀번호">
+    </div>
+    <div class="form-row">
+      <label>새 비밀번호 (변경 시에만 입력, 6자리 이상)</label>
+      <input type="password" id="myInfoNewPw" placeholder="새 비밀번호">
+    </div>
+    <div class="form-row">
+      <label>새 비밀번호 확인</label>
+      <input type="password" id="myInfoNewPwConfirm" placeholder="새 비밀번호 확인">
+    </div>
+    <div class="auth-error" id="myInfoError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('myInfoModal')">닫기</button>
+      <button class="btn btn-primary" onclick="saveMyInfo()">변경하기</button>
     </div>
   </div>
 </div>
@@ -741,12 +800,26 @@ async function sha256(text) {
 function showLogin() {
   document.getElementById('loginForm').style.display = '';
   document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('resetForm').style.display = 'none';
   document.getElementById('loginError').textContent = '';
 }
 function showSignup() {
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('signupForm').style.display = '';
+  document.getElementById('resetForm').style.display = 'none';
   document.getElementById('signupError').textContent = '';
+}
+
+let resetTargetEmail = null;
+function showReset(email) {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('resetForm').style.display = '';
+  document.getElementById('resetName').value = '';
+  document.getElementById('resetPassword').value = '';
+  document.getElementById('resetPasswordConfirm').value = '';
+  document.getElementById('resetError').textContent = '';
+  resetTargetEmail = email;
 }
 
 async function handleLogin() {
@@ -770,26 +843,62 @@ async function handleLogin() {
 }
 
 async function handleSignup() {
-  const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
-  const password = document.getElementById('signupPassword').value;
-  const confirm  = document.getElementById('signupPasswordConfirm').value;
-  const errEl    = document.getElementById('signupError');
+  const name      = document.getElementById('signupName').value.trim();
+  const email     = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password  = document.getElementById('signupPassword').value;
+  const confirmPw = document.getElementById('signupPasswordConfirm').value;
+  const errEl     = document.getElementById('signupError');
   errEl.textContent = '';
-  if (!email || !password || !confirm) { errEl.textContent = '모든 항목을 입력해주세요'; return; }
+  if (!name) { errEl.textContent = '이름을 입력해주세요'; return; }
+  if (!email || !password || !confirmPw) { errEl.textContent = '모든 항목을 입력해주세요'; return; }
   if (password.length < 6) { errEl.textContent = '비밀번호는 6자리 이상이어야 합니다'; return; }
-  if (password !== confirm) { errEl.textContent = '비밀번호가 일치하지 않습니다'; return; }
+  if (password !== confirmPw) { errEl.textContent = '비밀번호가 일치하지 않습니다'; return; }
   if (!sb) { errEl.textContent = 'DB 연결 오류입니다'; return; }
 
   const { data: existing } = await sb.from('golf_users').select('id').eq('email', email).maybeSingle();
-  if (existing) { errEl.textContent = '이미 가입된 이메일입니다'; return; }
+  if (existing) {
+    if (confirm('이미 가입된 이메일입니다.\n비밀번호를 재설정하시겠습니까?')) {
+      showReset(email);
+    } else {
+      errEl.textContent = '이미 가입된 이메일입니다';
+    }
+    return;
+  }
 
   const hash = await sha256(password);
-  const { error } = await sb.from('golf_users').insert([{ email, password_hash: hash }]);
+  const { error } = await sb.from('golf_users').insert([{ email, password_hash: hash, display_name: name }]);
   if (error) { errEl.textContent = '가입 실패: ' + error.message; return; }
 
   localStorage.setItem('golf_email', email);
   localStorage.setItem('golf_session', email);
   localStorage.setItem('golf_is_admin', '0');
+  enterApp();
+}
+
+async function handlePasswordReset() {
+  const name      = document.getElementById('resetName').value.trim();
+  const password  = document.getElementById('resetPassword').value;
+  const confirmPw = document.getElementById('resetPasswordConfirm').value;
+  const errEl     = document.getElementById('resetError');
+  errEl.textContent = '';
+  if (!name || !password || !confirmPw) { errEl.textContent = '모든 항목을 입력해주세요'; return; }
+  if (password.length < 6) { errEl.textContent = '비밀번호는 6자리 이상이어야 합니다'; return; }
+  if (password !== confirmPw) { errEl.textContent = '비밀번호가 일치하지 않습니다'; return; }
+  if (!sb || !resetTargetEmail) { errEl.textContent = 'DB 연결 오류입니다'; return; }
+
+  const { data, error } = await sb.from('golf_users').select('id,display_name,is_admin').eq('email', resetTargetEmail).maybeSingle();
+  if (error || !data) { errEl.textContent = '계정을 찾을 수 없습니다'; return; }
+  if ((data.display_name || '').trim() !== name) { errEl.textContent = '이름이 올바르지 않습니다'; return; }
+
+  const hash = await sha256(password);
+  const { error: updErr } = await sb.from('golf_users').update({ password_hash: hash }).eq('id', data.id);
+  if (updErr) { errEl.textContent = '재설정 실패: ' + updErr.message; return; }
+
+  const email = resetTargetEmail;
+  localStorage.setItem('golf_email', email);
+  localStorage.setItem('golf_session', email);
+  localStorage.setItem('golf_is_admin', data.is_admin ? '1' : '0');
+  resetTargetEmail = null;
   enterApp();
 }
 
@@ -811,6 +920,57 @@ function enterApp() {
   document.getElementById('settingsBtn').style.display = isAdmin() ? '' : 'none';
   document.getElementById('historyBtn').style.display = isAdmin() ? '' : 'none';
   init();
+}
+
+let myInfoUserId = null;
+let myInfoPasswordHash = null;
+
+async function openMyInfoModal() {
+  const email = localStorage.getItem('golf_session');
+  document.getElementById('myInfoEmail').value = email || '';
+  document.getElementById('myInfoName').value = '';
+  document.getElementById('myInfoCurrentPw').value = '';
+  document.getElementById('myInfoNewPw').value = '';
+  document.getElementById('myInfoNewPwConfirm').value = '';
+  document.getElementById('myInfoError').textContent = '';
+  openModal('myInfoModal');
+  if (!sb || !email) return;
+  const { data } = await sb.from('golf_users').select('id,display_name,password_hash').eq('email', email).maybeSingle();
+  if (data) {
+    myInfoUserId = data.id;
+    myInfoPasswordHash = data.password_hash;
+    document.getElementById('myInfoName').value = data.display_name || '';
+  }
+}
+
+async function saveMyInfo() {
+  const errEl = document.getElementById('myInfoError');
+  errEl.textContent = '';
+  if (!myInfoUserId) { errEl.textContent = '정보를 불러오지 못했습니다'; return; }
+
+  const name = document.getElementById('myInfoName').value.trim();
+  if (!name) { errEl.textContent = '이름을 입력해주세요'; return; }
+
+  const currentPw    = document.getElementById('myInfoCurrentPw').value;
+  const newPw        = document.getElementById('myInfoNewPw').value;
+  const newPwConfirm = document.getElementById('myInfoNewPwConfirm').value;
+
+  const updates = { display_name: name };
+
+  if (newPw || newPwConfirm) {
+    if (!currentPw) { errEl.textContent = '현재 비밀번호를 입력해주세요'; return; }
+    const currentHash = await sha256(currentPw);
+    if (currentHash !== myInfoPasswordHash) { errEl.textContent = '현재 비밀번호가 올바르지 않습니다'; return; }
+    if (newPw.length < 6) { errEl.textContent = '새 비밀번호는 6자리 이상이어야 합니다'; return; }
+    if (newPw !== newPwConfirm) { errEl.textContent = '새 비밀번호가 일치하지 않습니다'; return; }
+    updates.password_hash = await sha256(newPw);
+  }
+
+  const { error } = await sb.from('golf_users').update(updates).eq('id', myInfoUserId);
+  if (error) { errEl.textContent = '저장 실패: ' + error.message; return; }
+
+  closeModal('myInfoModal');
+  showToast('정보가 저장되었습니다 ✅', 'success');
 }
 
 async function checkSession() {
@@ -1506,14 +1666,15 @@ async function renderUsersTab() {
     }
     return `<tr>
       <td>${i + 1}</td>
+      <td style="text-align:left;white-space:nowrap">${escapeHtml(u.display_name || '-')}</td>
       <td style="text-align:left">${escapeHtml(u.email)}</td>
       <td>${dt}</td>
       <td>${roleLabel}</td>
       <td style="white-space:nowrap">${actions}</td>
     </tr>`;
-  }).join('') || '<tr><td colspan="5" style="color:#B0BEC5;padding:20px">회원이 없습니다</td></tr>';
+  }).join('') || '<tr><td colspan="6" style="color:#B0BEC5;padding:20px">회원이 없습니다</td></tr>';
 
-  c.innerHTML = `<div class="table-wrap"><table><thead><tr><th>순번</th><th style="text-align:left">이메일</th><th>가입일</th><th>권한</th><th>관리</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  c.innerHTML = `<div class="table-wrap"><table><thead><tr><th>순번</th><th style="text-align:left">이름</th><th style="text-align:left">이메일</th><th>가입일</th><th>권한</th><th>관리</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 async function promoteUser(id) {

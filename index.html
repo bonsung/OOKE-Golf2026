@@ -66,8 +66,9 @@
   /* ── YEAR TABS ── */
   .year-tabs {
     max-width: 960px; margin: 0 auto; padding: 14px 16px 0;
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
   }
+  .year-tabs-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .year-tab {
     padding: 7px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;
     cursor: pointer; border: 1.5px solid var(--border); background: #fff; color: var(--text2);
@@ -277,6 +278,55 @@
   .auth-switch a { color: var(--accent); font-weight: 700; cursor: pointer; text-decoration: none; }
   .auth-switch a:hover { text-decoration: underline; }
 
+  /* ── BOARD ── */
+  .board-modal {
+    width: 85vw; max-width: 85vw; height: 85vh; max-height: 85vh;
+    display: flex; flex-direction: column; padding: 0; overflow: hidden;
+  }
+  .board-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .board-header h2 { margin: 0; }
+  .board-body { flex: 1; overflow-y: auto; padding: 18px 24px; }
+  .btn-close-board { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text2); line-height: 1; }
+  .btn-close-board:hover { color: #E05555; }
+
+  .post-list-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 12px; border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: background 0.15s; border-radius: 8px;
+  }
+  .post-list-item:hover { background: #F0F6FC; }
+  .post-list-title { font-weight: 700; color: var(--text); font-size: 0.94rem; }
+  .post-list-meta { font-size: 0.76rem; color: var(--text2); margin-top: 3px; }
+  .post-list-comment-count { font-size: 0.76rem; color: var(--accent); font-weight: 700; white-space: nowrap; margin-left: 12px; }
+  .board-empty { text-align: center; color: #B0BEC5; padding: 60px 20px; }
+
+  .post-detail-title { font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+  .post-detail-meta { font-size: 0.78rem; color: var(--text2); margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1.5px dashed var(--border); }
+  .post-detail-content { white-space: pre-wrap; line-height: 1.6; font-size: 0.92rem; color: var(--text); margin-bottom: 20px; }
+  .post-actions { display: flex; gap: 8px; margin-bottom: 18px; }
+
+  .comment-item { padding: 10px 0; border-bottom: 1px solid #EBF0F5; }
+  .comment-meta { font-size: 0.74rem; color: var(--text2); display: flex; align-items: center; justify-content: space-between; }
+  .comment-content { font-size: 0.86rem; color: var(--text); margin-top: 4px; white-space: pre-wrap; }
+
+  @media (max-width: 700px) {
+    .board-modal { width: 96vw; max-width: 96vw; height: 92vh; max-height: 92vh; }
+    .board-body { padding: 14px 16px; }
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #1E3A52; color: #fff; text-align: center;
+    padding: 14px 16px; min-height: 80px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.9rem; }
+  .footer-copy { font-size: 0.76rem; color: rgba(255,255,255,0.75); }
+  .footer-powered { font-size: 0.7rem; color: rgba(255,255,255,0.55); }
+
   /* ── TOAST ── */
   #toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(70px);
@@ -450,7 +500,10 @@
   </div>
 </header>
 
-<div class="year-tabs" id="yearTabs"></div>
+<div class="year-tabs">
+  <div class="year-tabs-left" id="yearTabs"></div>
+  <button class="btn btn-accent btn-sm" onclick="openBoardModal()">📋 게시판</button>
+</div>
 
 <main>
   <div id="teamsContainer"></div>
@@ -475,6 +528,19 @@
     </div>
   </div>
 </main>
+
+<footer>
+  <div class="footer-brand">
+    <svg width="20" height="20" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="68" width="72" height="8" rx="4" fill="#4CAF50"/>
+      <circle cx="40" cy="65" r="6" fill="white"/>
+      <path d="M40 32 C40 32 30 25 30 19 C30 15 34 12 37 14 C38.5 15 40 17 40 17 C40 17 41.5 15 43 14 C46 12 50 15 50 19 C50 25 40 32 40 32Z" fill="#fff"/>
+    </svg>
+    오!오키은 골프 모임
+  </div>
+  <div class="footer-copy">© 2026 오!오키은 Golf Club. All rights reserved.</div>
+  <div class="footer-powered">Powered by Supabase &amp; GitHub Pages</div>
+</footer>
 </div>
 
 <div id="toast"></div>
@@ -578,6 +644,17 @@
   </div>
 </div>
 
+<!-- 게시판 모달 -->
+<div class="modal-overlay" id="boardModal">
+  <div class="modal board-modal">
+    <div class="board-header">
+      <h2>📋 게시판</h2>
+      <button class="btn-close-board" onclick="closeModal('boardModal')" title="닫기">✕</button>
+    </div>
+    <div class="board-body" id="boardContent"></div>
+  </div>
+</div>
+
 <!-- 수정 이력 모달 -->
 <div class="modal-overlay" id="historyModal">
   <div class="modal" style="max-width:640px">
@@ -620,6 +697,9 @@ let _id = 200;
 const nid = () => _id++;
 let selectedYear = null;
 let pendingYears = [];
+let boardPosts = [];
+let boardComments = [];
+let currentPostId = null;
 
 const DEFAULTS = {
   teams:   [{ id:1,name:'1조',order:1 },{ id:2,name:'2조',order:2 }],
@@ -730,6 +810,194 @@ async function checkSession() {
     document.getElementById('appContainer').style.display = 'none';
     hideLoading();
   }
+}
+
+// ═══════════════════════════════════════════
+// 게시판
+// ═══════════════════════════════════════════
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+function authorLabel(email) { return email ? email.split('@')[0] : '익명'; }
+
+async function loadBoardData() {
+  if (!sb) { boardPosts = []; boardComments = []; return; }
+  const [p, c] = await Promise.all([
+    sb.from('posts').select('*').order('created_at', { ascending: false }),
+    sb.from('comments').select('*').order('created_at', { ascending: true })
+  ]);
+  boardPosts = p.data || [];
+  boardComments = c.data || [];
+}
+
+async function openBoardModal() {
+  openModal('boardModal');
+  document.getElementById('boardContent').innerHTML = '<p style="padding:16px;color:#8A9BA8">불러오는 중...</p>';
+  if (!sb) { document.getElementById('boardContent').innerHTML = '<p style="padding:16px;color:#8A9BA8">DB 연결 오류입니다</p>'; return; }
+  await loadBoardData();
+  currentPostId = null;
+  renderBoardList();
+}
+
+function backToList() { currentPostId = null; renderBoardList(); }
+
+function renderBoardList() {
+  const email = localStorage.getItem('golf_session');
+  const writeBtn = email ? `<button class="btn btn-accent btn-sm" onclick="openPostForm()">✏️ 글쓰기</button>` : '';
+  let rows;
+  if (!boardPosts.length) {
+    rows = `<div class="board-empty">아직 게시글이 없습니다 ✨</div>`;
+  } else {
+    rows = boardPosts.map(p => {
+      const cnt = boardComments.filter(c => c.post_id === p.id).length;
+      const dt = new Date(p.created_at).toLocaleDateString('ko-KR');
+      return `<div class="post-list-item" onclick="openPostDetail(${p.id})">
+        <div>
+          <div class="post-list-title">${escapeHtml(p.title)}</div>
+          <div class="post-list-meta">${authorLabel(p.author_email)} · ${dt}</div>
+        </div>
+        <div class="post-list-comment-count">💬 ${cnt}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('boardContent').innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">${writeBtn}</div>
+    ${rows}
+  `;
+}
+
+function openPostDetail(postId) {
+  currentPostId = postId;
+  renderPostDetail();
+}
+
+function renderPostDetail() {
+  const post = boardPosts.find(p => p.id === currentPostId);
+  if (!post) { renderBoardList(); return; }
+  const email = localStorage.getItem('golf_session');
+  const isOwner = !!email && post.author_email === email;
+  const canDelete = isOwner || isAdmin();
+  const dt = new Date(post.created_at).toLocaleString('ko-KR');
+  const comments = boardComments.filter(c => c.post_id === post.id);
+
+  const commentRows = comments.map(c => {
+    const cOwner = !!email && c.author_email === email;
+    const cDelete = cOwner || isAdmin();
+    return `<div class="comment-item">
+      <div class="comment-meta">
+        <span>${authorLabel(c.author_email)} · ${new Date(c.created_at).toLocaleString('ko-KR')}</span>
+        ${cDelete ? `<button class="del-btn" onclick="deleteComment(${c.id})" title="삭제">✕</button>` : ''}
+      </div>
+      <div class="comment-content">${escapeHtml(c.content)}</div>
+    </div>`;
+  }).join('') || '<p style="color:#B0BEC5;font-size:0.82rem;padding:10px 0">아직 댓글이 없습니다</p>';
+
+  const commentForm = email ? `
+    <div class="form-row" style="margin-top:14px">
+      <textarea id="newCommentInput" rows="2" placeholder="댓글을 입력하세요"></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn btn-primary btn-sm" onclick="addComment(${post.id})">댓글 등록</button>
+    </div>` : '<p style="color:#B0BEC5;font-size:0.8rem;margin-top:14px">댓글을 작성하려면 로그인해주세요</p>';
+
+  document.getElementById('boardContent').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="backToList()">← 목록으로</button>
+    <div class="post-detail-title" style="margin-top:14px">${escapeHtml(post.title)}</div>
+    <div class="post-detail-meta">${authorLabel(post.author_email)} · ${dt}</div>
+    <div class="post-detail-content">${escapeHtml(post.content)}</div>
+    <div class="post-actions">
+      ${isOwner ? `<button class="btn btn-outline btn-sm" onclick="openPostForm(${post.id})">✏️ 수정</button>` : ''}
+      ${canDelete ? `<button class="btn btn-danger btn-sm" onclick="deletePost(${post.id})">🗑 삭제</button>` : ''}
+    </div>
+    <hr class="divider">
+    <div style="font-weight:700;color:var(--primary);font-size:0.86rem;margin-bottom:8px">💬 댓글 ${comments.length}</div>
+    ${commentRows}
+    ${commentForm}
+  `;
+}
+
+function openPostForm(editId) {
+  const editing = editId != null;
+  const post = editing ? boardPosts.find(p => p.id === editId) : null;
+  const cancelAction = editing ? `openPostDetail(${editId})` : 'backToList()';
+  document.getElementById('boardContent').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="${cancelAction}">← 취소</button>
+    <div class="form-row" style="margin-top:14px">
+      <label>제목</label>
+      <input type="text" id="postTitleInput" value="${post ? escapeHtml(post.title) : ''}" placeholder="제목을 입력하세요">
+    </div>
+    <div class="form-row">
+      <label>내용</label>
+      <textarea id="postContentInput" rows="10" placeholder="내용을 입력하세요">${post ? escapeHtml(post.content) : ''}</textarea>
+    </div>
+    <div class="auth-error" id="postFormError"></div>
+    <div class="modal-actions" style="justify-content:flex-start">
+      <button class="btn btn-primary" onclick="savePost(${editing ? editId : 'null'})">💾 저장</button>
+    </div>
+  `;
+}
+
+async function savePost(editId) {
+  const email = localStorage.getItem('golf_session');
+  if (!email) { showToast('로그인이 필요합니다', 'error'); return; }
+  const title   = document.getElementById('postTitleInput').value.trim();
+  const content = document.getElementById('postContentInput').value.trim();
+  const errEl   = document.getElementById('postFormError');
+  if (!title || !content) { errEl.textContent = '제목과 내용을 입력해주세요'; return; }
+
+  if (editId != null) {
+    const post = boardPosts.find(p => p.id === editId);
+    if (!post || post.author_email !== email) { showToast('수정 권한이 없습니다', 'error'); return; }
+    const { error } = await sb.from('posts').update({ title, content, updated_at: new Date().toISOString() }).eq('id', editId);
+    if (error) { errEl.textContent = '저장 실패: ' + error.message; return; }
+  } else {
+    const { error } = await sb.from('posts').insert([{ title, content, author_email: email, author_name: authorLabel(email) }]);
+    if (error) { errEl.textContent = '작성 실패: ' + error.message; return; }
+  }
+  await loadBoardData();
+  if (editId != null) { openPostDetail(editId); } else { backToList(); }
+  showToast(editId != null ? '수정 완료 ✅' : '게시글이 등록되었습니다 ✅', 'success');
+}
+
+async function deletePost(postId) {
+  const email = localStorage.getItem('golf_session');
+  const post = boardPosts.find(p => p.id === postId);
+  if (!post) return;
+  if (post.author_email !== email && !isAdmin()) { showToast('삭제 권한이 없습니다', 'error'); return; }
+  if (!confirm('이 게시글을 삭제할까요? (댓글도 함께 삭제됩니다)')) return;
+  await sb.from('comments').delete().eq('post_id', postId);
+  await sb.from('posts').delete().eq('id', postId);
+  await loadBoardData();
+  backToList();
+  showToast('삭제되었습니다', 'success');
+}
+
+async function addComment(postId) {
+  const email = localStorage.getItem('golf_session');
+  if (!email) { showToast('로그인이 필요합니다', 'error'); return; }
+  const input = document.getElementById('newCommentInput');
+  const content = input.value.trim();
+  if (!content) { showToast('댓글 내용을 입력해주세요', 'error'); return; }
+  const { error } = await sb.from('comments').insert([{ post_id: postId, content, author_email: email, author_name: authorLabel(email) }]);
+  if (error) { showToast('등록 실패: ' + error.message, 'error'); return; }
+  await loadBoardData();
+  openPostDetail(postId);
+  showToast('댓글이 등록되었습니다 ✅', 'success');
+}
+
+async function deleteComment(commentId) {
+  const email = localStorage.getItem('golf_session');
+  const c = boardComments.find(x => x.id === commentId);
+  if (!c) return;
+  if (c.author_email !== email && !isAdmin()) { showToast('삭제 권한이 없습니다', 'error'); return; }
+  if (!confirm('이 댓글을 삭제할까요?')) return;
+  await sb.from('comments').delete().eq('id', commentId);
+  await loadBoardData();
+  renderPostDetail();
+  showToast('댓글이 삭제되었습니다', 'success');
 }
 
 // ═══════════════════════════════════════════

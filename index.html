@@ -132,6 +132,39 @@
   .btn-danger:hover  { background: #C74444; }
   .btn-sm        { padding: 5px 10px; font-size: 0.75rem; border-radius: 8px; }
 
+  /* 헤더 액션 버튼 (역할별 구분 색상) */
+  .header-btn {
+    border: none; border-radius: 8px; cursor: pointer; color: #fff;
+    font-family: 'Pretendard', sans-serif; font-size: 0.78rem; font-weight: 700;
+    padding: 6px 14px; display: inline-flex; align-items: center; gap: 5px;
+    transition: filter 0.18s, transform 0.18s;
+  }
+  .header-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .header-btn-info     { background: #5BA4CF; }
+  .header-btn-settings { background: #7EB8A4; }
+  .header-btn-history  { background: #8FA3B1; }
+  .header-btn-logout   { background: transparent; border: 1.5px solid #fff; }
+  .header-btn-logout:hover { background: rgba(255,255,255,0.15); }
+
+  /* 게시판 버튼 */
+  .btn-board {
+    background: #C9A84C; color: #fff; border: none; border-radius: 20px;
+    padding: 7px 16px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    font-family: 'Pretendard', sans-serif; display: inline-flex; align-items: center; gap: 5px;
+    box-shadow: 0 3px 10px rgba(201,168,76,0.35); transition: all 0.18s;
+  }
+  .btn-board:hover { background: #D9BB63; transform: translateY(-1px); box-shadow: 0 5px 14px rgba(201,168,76,0.45); }
+
+  /* 라운드 추가 버튼 */
+  .btn-round-add {
+    background: var(--primary); color: #fff; border: none; border-radius: 10px;
+    padding: 6px 14px; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    font-family: 'Pretendard', sans-serif; display: inline-flex; align-items: center; gap: 6px;
+    transition: background 0.18s, transform 0.18s;
+  }
+  .btn-round-add:hover { background: var(--accent); transform: translateY(-1px); }
+  .btn-round-add .plus-icon { font-size: 1.05rem; font-weight: 800; line-height: 1; }
+
   /* ── TABLE ── */
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; min-width: 500px; }
@@ -541,17 +574,17 @@
   </div>
   <div class="header-actions">
     <div class="header-actions-inner">
-      <button class="btn btn-outline btn-sm" id="myInfoBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openMyInfoModal()">🔑 내 정보</button>
-      <button class="btn btn-outline btn-sm" id="settingsBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openSettingsModal()">⚙️ 설정</button>
-      <button class="btn btn-outline btn-sm" id="historyBtn" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="openHistoryModal()">📋 수정이력</button>
-      <button class="btn btn-outline btn-sm" style="border-color:rgba(255,255,255,0.5);color:#fff;background:rgba(255,255,255,0.15);" onclick="handleLogout()">🚪 로그아웃</button>
+      <button class="header-btn header-btn-info" id="myInfoBtn" onclick="openMyInfoModal()">🔑 내 정보</button>
+      <button class="header-btn header-btn-settings" id="settingsBtn" onclick="openSettingsModal()">⚙️ 설정</button>
+      <button class="header-btn header-btn-history" id="historyBtn" onclick="openHistoryModal()">📋 수정이력</button>
+      <button class="header-btn header-btn-logout" onclick="handleLogout()">🚪 로그아웃</button>
     </div>
   </div>
 </header>
 
 <div class="year-tabs">
   <div class="year-tabs-left" id="yearTabs"></div>
-  <button class="btn btn-accent btn-sm" onclick="openBoardModal()">📋 게시판</button>
+  <button class="btn-board" onclick="openBoardModal()">📋 게시판</button>
 </div>
 
 <main>
@@ -1294,7 +1327,7 @@ function buildTeamCard(team) {
         <div class="card-title">${team.order===1?'🌸':'⛳'} ${team.name}<span class="badge-cnt">${members.length}명</span></div>
         ${isAdmin() ? '<span class="card-hint">💡 셀을 더블클릭하면 바로 수정 가능</span>' : ''}
       </div>
-      ${isAdmin() ? `<button class="btn btn-accent btn-sm" onclick="openRoundModal(${team.id})">+ 라운드 추가</button>` : ''}
+      ${isAdmin() ? `<button class="btn-round-add" onclick="openRoundModal(${team.id})"><span class="plus-icon">+</span> 라운드 추가</button>` : ''}
     </div>
     <div class="table-wrap">${buildTable(team, members, rounds)}</div>`;
   return card;

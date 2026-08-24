@@ -826,6 +826,7 @@ let boardPosts = [];
 let boardComments = [];
 let currentPostId = null;
 let allUsers = [];
+let userDisplayNames = {};
 
 const DEFAULTS = {
   teams:   [{ id:1,name:'1조',order:1 },{ id:2,name:'2조',order:2 }],
@@ -1049,16 +1050,23 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-function authorLabel(email) { return email ? email.split('@')[0] : '익명'; }
+function authorLabel(email) {
+  if (!email) return '익명';
+  const name = (userDisplayNames[email] || '').trim();
+  return name || email.split('@')[0];
+}
 
 async function loadBoardData() {
   if (!sb) { boardPosts = []; boardComments = []; return; }
-  const [p, c] = await Promise.all([
+  const [p, c, u] = await Promise.all([
     sb.from('posts').select('*').order('created_at', { ascending: false }),
-    sb.from('comments').select('*').order('created_at', { ascending: true })
+    sb.from('comments').select('*').order('created_at', { ascending: true }),
+    sb.from('golf_users').select('email,display_name')
   ]);
   boardPosts = p.data || [];
   boardComments = c.data || [];
+  userDisplayNames = {};
+  (u.data || []).forEach(row => { userDisplayNames[row.email] = row.display_name; });
 }
 
 async function openBoardModal() {

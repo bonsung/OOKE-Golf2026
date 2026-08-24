@@ -356,6 +356,7 @@
   .post-list-item:hover { background: #F0F6FC; }
   .post-list-title { font-weight: 700; color: var(--text); font-size: 0.94rem; }
   .post-list-meta { font-size: 0.76rem; color: var(--text2); margin-top: 3px; }
+  .post-list-preview { font-size: 0.82rem; color: #5A7A94; margin-top: 4px; }
   .post-list-comment-count { font-size: 0.76rem; color: var(--accent); font-weight: 700; white-space: nowrap; margin-left: 12px; }
   .board-empty { text-align: center; color: #B0BEC5; padding: 60px 20px; }
 
@@ -1056,6 +1057,11 @@ function authorLabel(email) {
   return name || email.split('@')[0];
 }
 
+function postPreview(content) {
+  const text = (content || '').trim();
+  return text.length > 50 ? text.slice(0, 50) + '...' : text;
+}
+
 async function loadBoardData() {
   if (!sb) { boardPosts = []; boardComments = []; return; }
   const [p, c, u] = await Promise.all([
@@ -1090,10 +1096,12 @@ function renderBoardList() {
     rows = boardPosts.map(p => {
       const cnt = boardComments.filter(c => c.post_id === p.id).length;
       const dt = new Date(p.created_at).toLocaleDateString('ko-KR');
+      const preview = postPreview(p.content);
       return `<div class="post-list-item" onclick="openPostDetail(${p.id})">
         <div>
           <div class="post-list-title">${escapeHtml(p.title)}</div>
           <div class="post-list-meta">${authorLabel(p.author_email)} · ${dt}</div>
+          <div class="post-list-preview">${escapeHtml(preview)}</div>
         </div>
         <div class="post-list-comment-count">💬 ${cnt}</div>
       </div>`;

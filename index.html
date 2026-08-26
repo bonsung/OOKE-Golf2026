@@ -248,6 +248,16 @@
   .leader-name   { font-size: 1.05rem; font-weight: 800; color: var(--text); }
   .leader-stat   { font-size: 0.73rem; color: var(--text2); margin-top: 3px; }
   .leader-team   { font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-top: 2px; }
+  .leader-comment {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: #F4F7FB;
+    border-left: 3px solid var(--primary);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--text2);
+  }
 
   /* ── MODAL ── */
   .modal-overlay {
@@ -613,6 +623,7 @@
         <div class="leader-team" id="leader2-team"></div>
       </div>
     </div>
+    <div class="leader-comment" id="leaderComment"></div>
   </div>
 </main>
 
@@ -1494,9 +1505,77 @@ function renderLeader() {
     stats.push({ name: m.name, team: team?.name, wins: t1[m.id]||0, seconds: t2[m.id]||0 });
   }
   stats.sort((a,b) => b.wins - a.wins || b.seconds - a.seconds);
+
+  const maxWins = stats.length ? stats[0].wins : 0;
+  const rank1Group = maxWins > 0 ? stats.filter(s => s.wins === maxWins) : [];
+  const remaining  = stats.filter(s => !rank1Group.includes(s));
+  let rank2Group = [];
+  if (remaining.length) {
+    const secondWins = Math.max(...remaining.map(s => s.wins));
+    if (secondWins > 0) rank2Group = remaining.filter(s => s.wins === secondWins);
+  }
+
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  if (stats[0]) { set('leader1-name', stats[0].name); set('leader1-stat', `🥇 ${stats[0].wins}회 우승`); set('leader1-team', stats[0].team||''); }
-  if (stats[1]) { set('leader2-name', stats[1].name); set('leader2-stat', `🥇 ${stats[1].wins}회 우승`); set('leader2-team', stats[1].team||''); }
+  const uniqTeams = arr => [...new Set(arr.map(s => s.team).filter(Boolean))].join(' · ');
+
+  if (rank1Group.length) {
+    set('leader1-name', rank1Group.map(s => s.name).join(' · '));
+    set('leader1-stat', `🥇 ${maxWins}회 우승` + (rank1Group.length > 1 ? ` (공동 ${rank1Group.length}명)` : ''));
+    set('leader1-team', uniqTeams(rank1Group));
+  } else {
+    set('leader1-name', '-'); set('leader1-stat', ''); set('leader1-team', '');
+  }
+
+  if (rank2Group.length) {
+    set('leader2-name', rank2Group.map(s => s.name).join(' · '));
+    set('leader2-stat', `🥈 ${rank2Group[0].wins}회 우승` + (rank2Group.length > 1 ? ` (공동 ${rank2Group.length}명)` : ''));
+    set('leader2-team', uniqTeams(rank2Group));
+  } else {
+    set('leader2-name', '-'); set('leader2-stat', ''); set('leader2-team', '');
+  }
+
+  renderLeaderComment(rank1Group, rank2Group, maxWins, stats);
+}
+
+function renderLeaderComment(rank1Group, rank2Group, maxWins, stats) {
+  const el = document.getElementById('leaderComment');
+  if (!el) return;
+
+  if (!stats.length || maxWins === 0) {
+    el.textContent = '⛳ 아직 공식 경기 우승 기록이 없어요. 이번 시즌 첫 트로피의 주인공은 누가 될까요?';
+    return;
+  }
+
+  const names1 = rank1Group.map(s => s.name);
+  const names2 = rank2Group.map(s => s.name);
+
+  let line1;
+  if (names1.length === 1) {
+    line1 = `👑 시즌 1위는 단독 선두 ${names1[0]}님! ${maxWins}승을 챙기며 이번 시즌 분위기를 확실히 잡았네요.`;
+  } else {
+    line1 = `👑 시즌 1위가 무려 ${names1.length}명 공동! ${names1.join(', ')}님이 나란히 ${maxWins}승으로 어깨를 겨루고 있습니다. 우열을 가리기 힘든 접전이에요.`;
+  }
+
+  let line2 = '';
+  if (names2.length) {
+    const secondWins = rank2Group[0].wins;
+    if (names2.length === 1) {
+      line2 = ` 2위는 ${names2[0]}님(${secondWins}승) — 1위 자리를 호시탐탐 노리는 만년 추격자 포지션이네요.`;
+    } else {
+      line2 = ` 2위는 ${names2.join(', ')}님이 사이좋게 ${secondWins}승 공동 랭크! 다음 라운드가 진짜 승부처가 될 듯합니다.`;
+    }
+  }
+
+  const totalPodium = stats.reduce((sum, s) => sum + s.wins + s.seconds, 0);
+  const closers = [
+    '다음 라운드, 순위표가 또 한 번 요동칠 예정입니다 ⛳',
+    '오늘 스코어 하나가 시즌 전체 판도를 바꿀 수도 있어요 🔥',
+    '트로피의 주인은 아직 완전히 정해지지 않았습니다 🏆',
+    '방심은 금물, 순위는 언제든 뒤집힙니다 😉'
+  ];
+  const closer = closers[totalPodium % closers.length];
+
+  el.textContent = `${line1}${line2} ${closer}`;
 }
 
 // ═══════════════════════════════════════════

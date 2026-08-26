@@ -250,13 +250,23 @@
   .leader-team   { font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-top: 2px; }
   .leader-comment {
     margin-top: 16px;
-    padding: 14px 16px;
-    background: #F4F7FB;
-    border-left: 3px solid var(--primary);
-    border-radius: 10px;
-    font-size: 0.85rem;
-    line-height: 1.65;
-    color: var(--text2);
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #EAF3FC, #F4F7FB);
+    border-left: 4px solid #FF7A45;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.75;
+    color: #2C5F8A;
+    letter-spacing: -0.2px;
+  }
+  .leader-comment strong {
+    color: #FF7A45;
+    font-weight: 800;
+  }
+  .leader-comment .comment-cheer {
+    color: #1E9E6B;
+    font-weight: 800;
   }
 
   /* ── MODAL ── */
@@ -1502,17 +1512,18 @@ function renderLeader() {
     const teamMembers = state.members.filter(x => x.team_id === m.team_id);
     const t1 = computeTally(teamMembers, teamRounds, 1);
     const t2 = computeTally(teamMembers, teamRounds, 2);
-    stats.push({ name: m.name, team: team?.name, wins: t1[m.id]||0, seconds: t2[m.id]||0 });
+    stats.push({ id: m.id, name: m.name, team: team?.name, wins: t1[m.id]||0, seconds: t2[m.id]||0 });
   }
   stats.sort((a,b) => b.wins - a.wins || b.seconds - a.seconds);
 
   const maxWins = stats.length ? stats[0].wins : 0;
-  const rank1Group = maxWins > 0 ? stats.filter(s => s.wins === maxWins) : [];
-  const remaining  = stats.filter(s => !rank1Group.includes(s));
+  const rank1Group = maxWins > 0
+    ? stats.filter(s => s.wins === stats[0].wins && s.seconds === stats[0].seconds)
+    : [];
+  const remaining = stats.filter(s => !rank1Group.includes(s));
   let rank2Group = [];
-  if (remaining.length) {
-    const secondWins = Math.max(...remaining.map(s => s.wins));
-    if (secondWins > 0) rank2Group = remaining.filter(s => s.wins === secondWins);
+  if (remaining.length && remaining[0].wins > 0) {
+    rank2Group = remaining.filter(s => s.wins === remaining[0].wins && s.seconds === remaining[0].seconds);
   }
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
@@ -1542,27 +1553,44 @@ function renderLeaderComment(rank1Group, rank2Group, maxWins, stats) {
   if (!el) return;
 
   if (!stats.length || maxWins === 0) {
-    el.textContent = '⛳ 아직 공식 경기 우승 기록이 없어요. 이번 시즌 첫 트로피의 주인공은 누가 될까요?';
+    el.innerHTML = '⛳ 아직 공식 경기 우승 기록이 없어요. 이번 시즌 첫 트로피의 주인공은 누가 될까요?';
     return;
   }
 
-  const names1 = rank1Group.map(s => s.name);
-  const names2 = rank2Group.map(s => s.name);
+  const names1 = rank1Group.map(s => `<strong>${s.name}</strong>`);
+  const names2 = rank2Group.map(s => `<strong>${s.name}</strong>`);
 
   let line1;
-  if (names1.length === 1) {
+  if (rank1Group.length === 1) {
     line1 = `👑 시즌 1위는 단독 선두 ${names1[0]}님! ${maxWins}승을 챙기며 이번 시즌 분위기를 확실히 잡았네요.`;
   } else {
-    line1 = `👑 시즌 1위가 무려 ${names1.length}명 공동! ${names1.join(', ')}님이 나란히 ${maxWins}승으로 어깨를 겨루고 있습니다. 우열을 가리기 힘든 접전이에요.`;
+    line1 = `👑 시즌 1위가 무려 ${rank1Group.length}명 공동! ${names1.join(', ')}님이 나란히 ${maxWins}승으로 어깨를 겨루고 있습니다. 우열을 가리기 힘든 접전이에요.`;
   }
 
   let line2 = '';
-  if (names2.length) {
+  if (rank2Group.length) {
     const secondWins = rank2Group[0].wins;
-    if (names2.length === 1) {
+    if (rank2Group.length === 1) {
       line2 = ` 2위는 ${names2[0]}님(${secondWins}승) — 1위 자리를 호시탐탐 노리는 만년 추격자 포지션이네요.`;
     } else {
       line2 = ` 2위는 ${names2.join(', ')}님이 사이좋게 ${secondWins}승 공동 랭크! 다음 라운드가 진짜 승부처가 될 듯합니다.`;
+    }
+  }
+
+  // 우승은 아직 없지만 준우승만 꾸준히 쌓은 회원에게 응원 멘트
+  const podiumIds = new Set([...rank1Group, ...rank2Group].map(s => s.id));
+  const grinders = stats
+    .filter(s => s.wins === 0 && s.seconds > 0 && !podiumIds.has(s.id))
+    .sort((a, b) => b.seconds - a.seconds);
+
+  let line3 = '';
+  if (grinders.length) {
+    const topSeconds = grinders[0].seconds;
+    const topGrinders = grinders.filter(s => s.seconds === topSeconds).map(s => `<strong>${s.name}</strong>`);
+    if (topGrinders.length === 1) {
+      line3 = ` <span class="comment-cheer">그리고 준우승만 벌써 ${topSeconds}번, ${topGrinders[0]}님! 우승 트로피가 이제 코앞입니다, 파이팅입니다 💪</span>`;
+    } else {
+      line3 = ` <span class="comment-cheer">그리고 준우승만 벌써 ${topSeconds}번씩 쌓은 ${topGrinders.join(', ')}님! 우승 트로피가 이제 코앞입니다, 파이팅입니다 💪</span>`;
     }
   }
 
@@ -1575,7 +1603,7 @@ function renderLeaderComment(rank1Group, rank2Group, maxWins, stats) {
   ];
   const closer = closers[totalPodium % closers.length];
 
-  el.textContent = `${line1}${line2} ${closer}`;
+  el.innerHTML = `${line1}${line2}${line3} ${closer}`;
 }
 
 // ═══════════════════════════════════════════

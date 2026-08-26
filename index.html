@@ -1531,7 +1531,9 @@ function renderLeader() {
 
   if (rank1Group.length) {
     set('leader1-name', rank1Group.map(s => s.name).join(' · '));
-    set('leader1-stat', `🥇 ${maxWins}회 우승` + (rank1Group.length > 1 ? ` (공동 ${rank1Group.length}명)` : ''));
+    const s1 = rank1Group[0].seconds;
+    const statText1 = `🥇 ${maxWins}승` + (s1 > 0 ? ` · 준우승 ${s1}회` : '') + (rank1Group.length > 1 ? ` (공동 ${rank1Group.length}명)` : '');
+    set('leader1-stat', statText1);
     set('leader1-team', uniqTeams(rank1Group));
   } else {
     set('leader1-name', '-'); set('leader1-stat', ''); set('leader1-team', '');
@@ -1539,7 +1541,9 @@ function renderLeader() {
 
   if (rank2Group.length) {
     set('leader2-name', rank2Group.map(s => s.name).join(' · '));
-    set('leader2-stat', `🥈 ${rank2Group[0].wins}회 우승` + (rank2Group.length > 1 ? ` (공동 ${rank2Group.length}명)` : ''));
+    const s2 = rank2Group[0].seconds;
+    const statText2 = `🥈 ${rank2Group[0].wins}승` + (s2 > 0 ? ` · 준우승 ${s2}회` : '') + (rank2Group.length > 1 ? ` (공동 ${rank2Group.length}명)` : '');
+    set('leader2-stat', statText2);
     set('leader2-team', uniqTeams(rank2Group));
   } else {
     set('leader2-name', '-'); set('leader2-stat', ''); set('leader2-team', '');
@@ -1562,7 +1566,9 @@ function renderLeaderComment(rank1Group, rank2Group, maxWins, stats) {
 
   let line1;
   if (rank1Group.length === 1) {
-    line1 = `👑 시즌 1위는 단독 선두 ${names1[0]}님! ${maxWins}승을 챙기며 이번 시즌 분위기를 확실히 잡았네요.`;
+    const s1 = rank1Group[0].seconds;
+    const record = s1 > 0 ? `${maxWins}승 · 준우승 ${s1}회 경력까지 더해` : `${maxWins}승을 챙기며`;
+    line1 = `👑 시즌 1위는 단독 선두 ${names1[0]}님! ${record} 이번 시즌 확실히 앞서가고 있네요.`;
   } else {
     line1 = `👑 시즌 1위가 무려 ${rank1Group.length}명 공동! ${names1.join(', ')}님이 나란히 ${maxWins}승으로 어깨를 겨루고 있습니다. 우열을 가리기 힘든 접전이에요.`;
   }
